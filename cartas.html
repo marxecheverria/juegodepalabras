@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Cartas - Memoria</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de colores modernos y suaves */
+            --primary: #8B9DC3;
+            --primary-dark: #6B7A9A;
+            --secondary: #D4A5A5;
+            --accent: #E6B17A;
+            --success: #9CAF88;
+            --warning: #D4A574;
+            --error: #C4A484;
+            
+            /* Colores de fondo modernos */
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #F1F5F9;
+            --bg-tertiary: #E2E8F0;
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(139, 157, 195, 0.1);
+            
+            /* Colores de texto modernos */
+            --text-primary: #1E293B;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            
+            /* Gradientes modernos y suaves */
+            --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
+            --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
+            --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
+            
+            /* Sombras modernas y suaves */
+            --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
+            --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
+            --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
+            --shadow-glow: 0 0 20px rgba(139, 157, 195, 0.3);
+            
+            /* Espaciado */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            
+            /* Bordes */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 32px;
+            
+            /* Transiciones */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo animado moderno con partículas suaves */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 157, 195, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 165, 165, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(230, 177, 122, 0.04) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        /* Contenedor principal */
+        .game-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--space-sm);
+            min-height: 100vh;
+        }
+
+        /* Header del juego */
+        .game-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: var(--space-lg);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bg-glass);
+        }
+
+        .game-title {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 4rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-sm);
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .game-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-sm);
+            filter: blur(2px);
+        }
+
+        .game-subtitle {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Panel principal del juego */
+        .game-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-md);
+            border: 1px solid var(--bg-glass);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        /* Layout horizontal del juego */
+        .game-layout {
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-start;
+            margin-top: var(--space-md);
+        }
+
+        /* Panel izquierdo: Temporizador y Pila de cartas encontradas */
+        .left-panel {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        /* Panel central: Área de juego de cartas */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-md);
+            min-height: 600px;
+        }
+
+        /* Panel derecho: Botones de control */
+        .right-panel {
+            flex: 0 0 180px;
+        }
+
+        .sidebar-section {
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--bg-glass);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            text-align: center;
+        }
+
+        /* Temporizador */
+        .timer-display {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(139, 157, 195, 0.3);
+            background: var(--bg-card);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Pila de cartas encontradas */
+        .found-cards-pile {
+            min-height: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm);
+            background: var(--bg-glass);
+            border-radius: var(--radius-md);
+            border: 2px dashed var(--primary);
+        }
+
+        .found-cards-row {
+            display: flex;
+            gap: var(--space-xs);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .found-card {
+            width: 50px;
+            height: 70px;
+            background: var(--gradient-success);
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-sm);
+            transform: rotate(-5deg);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .found-card:nth-child(2n+1) { transform: rotate(-3deg); }
+        .found-card:nth-child(2n+2) { transform: rotate(2deg); }
+
+        .found-card:hover {
+            transform: rotate(0deg) scale(1.1);
+            z-index: 10;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--bg-glass);
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Área de juego de cartas */
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 15px;
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 5 / 4;
+            padding: 15px;
+            background-color: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--bg-glass);
+        }
+
+        /* Cartas del juego */
+        .card {
+            width: 100%;
+            height: 0;
+            padding-bottom: 100%;
+            perspective: 1000px;
+            cursor: pointer;
+            border-radius: 50%;
+            position: relative;
+            box-shadow: var(--shadow-sm);
+            background: var(--bg-card);
+            border: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .card-inner {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            border-radius: 50%;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .card.flip .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front,
+        .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5em;
+            font-weight: bold;
+            user-select: none;
+        }
+
+        .card-front {
+            background: var(--gradient-primary);
+            color: var(--bg-card);
+            transform: rotateY(180deg);
+        }
+
+        .card-back {
+            background: var(--gradient-secondary);
+            color: var(--bg-card);
+            font-size: 2.8em;
+        }
+
+        .card.matched {
+            visibility: hidden;
+        }
+
+        /* Botones de control */
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .control-btn {
+            background: var(--gradient-primary);
+            color: var(--bg-card);
+            border: 2px solid var(--primary-dark);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-restart { background: var(--gradient-success); }
+        .btn-pause { background: var(--gradient-accent); }
+        .btn-hint { background: var(--gradient-secondary); }
+
+        /* Mensajes del juego */
+        #message {
+            margin-top: 20px;
+            display: none;
+            user-select: none;
+        }
+
+        .message-content {
+            background-color: var(--bg-card);
+            color: var(--text-primary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            box-shadow: var(--shadow-md);
+            display: inline-block;
+            user-select: none;
+            border: 1px solid var(--bg-glass);
+        }
+
+        .countdown {
+            font-size: 4rem;
+            font-weight: bold;
+            color: var(--accent);
+            text-shadow: 2px 2px 4px rgba(139, 157, 195, 0.3);
+            margin: 20px 0;
+            animation: pulse 1s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .memorize-phase .card {
+            cursor: default;
+        }
+
+        .memorize-phase .card:hover {
+            transform: none;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .game-layout {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+            
+            .left-panel, .right-panel {
+                flex: none;
+                width: 100%;
+            }
+            
+            .center-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .game-container {
+                padding: var(--space-md);
+            }
+            
+            .game-layout {
+                gap: var(--space-md);
+            }
+            
+            .left-panel, .right-panel {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Selección de texto */
+        ::selection {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Prevenir selección de texto */
+        .game-container, .game-panel, .game-board {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header del juego -->
+        <header class="game-header">
+            <h1 class="game-title">Juego de Memoria</h1>
+        </header>
+
+        <!-- Panel principal del juego -->
+        <main class="game-panel">
+            <!-- Layout horizontal del juego -->
+            <div class="game-layout">
+                <!-- Panel izquierdo: Temporizador y Pila de cartas encontradas -->
+                <div class="left-panel">
+                    <!-- Temporizador -->
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">⏱️ Tiempo</div>
+                        <div class="timer-display" id="timer">00:00</div>
+                    </div>
+
+                    <!-- Pila de cartas encontradas -->
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">🎯 Pares Encontrados</div>
+                        <div class="found-cards-pile" id="foundCardsPile">
+                            <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">
+                                Las cartas encontradas aparecerán aquí
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel central: Área de juego de cartas -->
+                <div class="center-panel">
+                    <div class="game-board" id="board"></div>
+                    <div id="message" class="mt-4"></div>
+                </div>
+
+                <!-- Panel derecho: Botones de control -->
+                <div class="right-panel">
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">🎮 Controles</div>
+                        <div class="control-buttons">
+                            <button class="control-btn btn-restart" id="restartBtn">🔄 Reiniciar</button>
+                            <button class="control-btn btn-pause" id="pauseBtn">⏸️ Pausar</button>
+                            <button class="control-btn btn-hint" id="hintBtn">💡 Pista</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal-overlay" id="memorizeModal">
+        <div class="modal-content">
+            <h2 class="modal-title">🧠 ¡Memoriza las cartas!</h2>
+            <p class="modal-text">Tienes 5 segundos para recordar la posición de cada emoji</p>
+            <div class="countdown">5</div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <h2 class="modal-title">🏆 ¡Felicidades!</h2>
+            <p class="modal-text" id="successMessage"></p>
+            <button class="modal-btn" onclick="restartGame()">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <script>
+        const board = document.getElementById("board");
+        const timerEl = document.getElementById("timer");
+        const messageEl = document.getElementById("message");
+        const foundCardsPile = document.getElementById("foundCardsPile");
+        const restartBtn = document.getElementById("restartBtn");
+        const pauseBtn = document.getElementById("pauseBtn");
+        const hintBtn = document.getElementById("hintBtn");
+
+        const emojis = ["🍎", "🍌", "🍇", "🍉", "🍓", "🍍", "🥝", "🍒", "🍑", "🍋"];
+        let deck = [];
+        let firstCard = null;
+        let secondCard = null;
+        let lockBoard = false;
+        let matchedPairs = 0;
+        let timer = 0;
+        let timerInterval = null;
+        let gamePhase = 'memorize';
+        let memorizeTimer = null;
+        let isPaused = false;
+
+        function shuffleDeck() {
+            const fullDeck = [...emojis, ...emojis];
+            return fullDeck.sort(() => 0.5 - Math.random());
+        }
+
+        function createCard(emoji) {
+            const card = document.createElement("div");
+            card.classList.add("card");
+            card.innerHTML = `
+                <div class="card-inner">
+                    <div class="card-front">${emoji}</div>
+                    <div class="card-back">🎰</div>
+                </div>
+            `;
+            card.dataset.emoji = emoji;
+            card.addEventListener("click", handleCardClick);
+            return card;
+        }
+
+        function showMemorizePhase() {
+            gamePhase = 'memorize';
+            lockBoard = true;
+            
+            board.classList.add('memorize-phase');
+            
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.add('flip');
+            });
+            
+            // Mostrar modal de memorización
+            const memorizeModal = document.getElementById('memorizeModal');
+            memorizeModal.style.display = 'flex';
+            
+            // Contador regresivo
+            let countdown = 5;
+            const countdownEl = memorizeModal.querySelector('.countdown');
+            
+            memorizeTimer = setInterval(() => {
+                countdown--;
+                countdownEl.textContent = countdown;
+                
+                if (countdown <= 0) {
+                    clearInterval(memorizeTimer);
+                    hideMemorizePhase();
+                }
+            }, 1000);
+        }
+
+        function hideMemorizePhase() {
+            gamePhase = 'playing';
+            lockBoard = false;
+            
+            // Cerrar modal de memorización
+            const memorizeModal = document.getElementById('memorizeModal');
+            memorizeModal.style.display = 'none';
+            
+            board.classList.remove('memorize-phase');
+            
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.classList.remove('flip');
+            });
+            
+            if (!isPaused) {
+                startTimer();
+            }
+        }
+
+        function startTimer() {
+            timer = 0;
+            timerInterval = setInterval(() => {
+                if (!isPaused) {
+                    timer++;
+                    updateTimer();
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(timer / 60);
+            const seconds = timer % 60;
+            timerEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+        }
+
+        function handleCardClick(e) {
+            const card = e.currentTarget;
+            if (lockBoard || card.classList.contains("flip") || gamePhase === 'memorize' || isPaused) return;
+
+            card.classList.add("flip");
+
+            if (!firstCard) {
+                firstCard = card;
+                return;
+            }
+
+            secondCard = card;
+            lockBoard = true;
+
+            if (firstCard.dataset.emoji === secondCard.dataset.emoji) {
+                setTimeout(() => {
+                    firstCard.classList.add("matched");
+                    secondCard.classList.add("matched");
+                    matchedPairs++;
+                    
+                    // Agregar carta a la pila de encontradas
+                    addCardToPile(firstCard.dataset.emoji);
+                    
+                    if (matchedPairs === emojis.length) {
+                        stopTimer();
+                        // Mostrar modal de éxito
+                        const successModal = document.getElementById('successModal');
+                        const successMessage = document.getElementById('successMessage');
+                        successMessage.textContent = `¡Has completado el juego en ${timer} segundos!`;
+                        successModal.style.display = 'flex';
+                    }
+                    resetTurn();
+                }, 600);
+            } else {
+                setTimeout(() => {
+                    firstCard.classList.remove("flip");
+                    secondCard.classList.remove("flip");
+                    resetTurn();
+                }, 1000);
+            }
+        }
+
+        function addCardToPile(emoji) {
+            // Limpiar mensaje inicial si existe
+            const initialMessage = foundCardsPile.querySelector('div[style*="color: var(--text-muted)"]');
+            if (initialMessage) {
+                initialMessage.remove();
+            }
+            
+            // Crear nueva fila si es necesario (cada fila contiene 2 pares = 4 cartas)
+            const currentRow = Math.floor(matchedPairs / 2);
+            let rowElement = foundCardsPile.querySelector(`.found-cards-row[data-row="${currentRow}"]`);
+            
+            if (!rowElement) {
+                rowElement = document.createElement("div");
+                rowElement.className = "found-cards-row";
+                rowElement.dataset.row = currentRow;
+                foundCardsPile.appendChild(rowElement);
+            }
+            
+            // Crear la carta
+            const cardElement = document.createElement("div");
+            cardElement.className = "found-card";
+            cardElement.textContent = emoji;
+            cardElement.style.zIndex = matchedPairs;
+            
+            rowElement.appendChild(cardElement);
+            
+            // Animación de entrada
+            cardElement.style.opacity = '0';
+            cardElement.style.transform = 'scale(0) rotate(0deg)';
+            setTimeout(() => {
+                cardElement.style.transition = 'all 0.5s ease';
+                cardElement.style.opacity = '1';
+                cardElement.style.transform = 'scale(1) rotate(-3deg)';
+            }, 100);
+        }
+
+        function resetTurn() {
+            [firstCard, secondCard] = [null, null];
+            lockBoard = false;
+        }
+
+        function startGame() {
+            if (memorizeTimer) {
+                clearInterval(memorizeTimer);
+            }
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Cerrar modales si están abiertos
+            document.querySelectorAll('.modal-overlay').forEach(modal => {
+                modal.style.display = 'none';
+            });
+            
+            board.innerHTML = "";
+            messageEl.style.display = 'none';
+            matchedPairs = 0;
+            resetTurn();
+            gamePhase = 'memorize';
+            board.classList.remove('memorize-phase');
+            isPaused = false;
+            
+            // Limpiar pila de cartas encontradas
+            foundCardsPile.innerHTML = `
+                <div style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">
+                    Las cartas encontradas aparecerán aquí
+                </div>
+            `;
+            
+            deck = shuffleDeck();
+            deck.forEach((emoji) => {
+                board.appendChild(createCard(emoji));
+            });
+            
+            setTimeout(() => {
+                showMemorizePhase();
+            }, 500);
+        }
+
+        function togglePause() {
+            isPaused = !isPaused;
+            if (isPaused) {
+                pauseBtn.textContent = '▶️ Reanudar';
+                pauseBtn.classList.remove('btn-pause');
+                pauseBtn.classList.add('btn-restart');
+            } else {
+                pauseBtn.textContent = '⏸️ Pausar';
+                pauseBtn.classList.remove('btn-restart');
+                pauseBtn.classList.add('btn-pause');
+            }
+        }
+
+        function showHint() {
+            if (gamePhase !== 'playing' || isPaused) return;
+            
+            const unflippedCards = document.querySelectorAll('.card:not(.flip):not(.matched)');
+            if (unflippedCards.length > 0) {
+                const randomCard = unflippedCards[Math.floor(Math.random() * unflippedCards.length)];
+                randomCard.style.boxShadow = '0 0 20px var(--accent)';
+                setTimeout(() => {
+                    randomCard.style.boxShadow = '';
+                }, 2000);
+            }
+        }
+
+        // Event listeners
+        restartBtn.addEventListener('click', startGame);
+        pauseBtn.addEventListener('click', togglePause);
+        hintBtn.addEventListener('click', showHint);
+
+        // Funciones para modales
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function restartGame() {
+            closeModal('successModal');
+            startGame();
+        }
+
+        // Cerrar modales con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+
+        // Cerrar modales haciendo clic fuera
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+
+        window.onload = startGame;
+    </script>
+</body>
+</html>
