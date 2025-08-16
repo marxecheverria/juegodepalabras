@@ -537,6 +537,22 @@
             box-shadow: var(--shadow-sm);
         }
 
+        /* Indicador de fase de memorización */
+        .memorize-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--gradient-primary);
+            color: var(--bg-card);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 600;
+            z-index: 10;
+            opacity: 0.9;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
         /* Responsive */
         @media (max-width: 1200px) {
             .game-layout {
@@ -726,18 +742,20 @@
                 card.classList.add('flip');
             });
             
-            // Mostrar modal de memorización
-            const memorizeModal = document.getElementById('memorizeModal');
-            memorizeModal.classList.add('memorize');
-            memorizeModal.style.display = 'flex';
+            // Agregar indicador visual sutil
+            const indicator = document.createElement('div');
+            indicator.className = 'memorize-indicator';
+            indicator.textContent = '🧠 Memorizando...';
+            board.appendChild(indicator);
             
-            // Contador regresivo
-            let countdown = 5;
-            const countdownEl = memorizeModal.querySelector('.countdown');
+            // No mostrar modal, solo mantener las cartas visibles por 10 segundos
+            // para que el usuario pueda memorizarlas tranquilamente
+            
+            // Contador regresivo interno (10 segundos total)
+            let countdown = 10;
             
             memorizeTimer = setInterval(() => {
                 countdown--;
-                countdownEl.textContent = countdown;
                 
                 if (countdown <= 0) {
                     clearInterval(memorizeTimer);
@@ -750,12 +768,13 @@
             gamePhase = 'playing';
             lockBoard = false;
             
-            // Cerrar modal de memorización
-            const memorizeModal = document.getElementById('memorizeModal');
-            memorizeModal.classList.remove('memorize');
-            memorizeModal.style.display = 'none';
-            
             board.classList.remove('memorize-phase');
+            
+            // Remover indicador de memorización
+            const indicator = board.querySelector('.memorize-indicator');
+            if (indicator) {
+                indicator.remove();
+            }
             
             const cards = document.querySelectorAll('.card');
             cards.forEach(card => {
@@ -881,7 +900,6 @@
             // Cerrar modales si están abiertos
             document.querySelectorAll('.modal-overlay').forEach(modal => {
                 modal.style.display = 'none';
-                modal.classList.remove('memorize');
             });
             
             board.innerHTML = "";
