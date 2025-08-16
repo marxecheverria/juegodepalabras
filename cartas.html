@@ -303,6 +303,18 @@
             animation: modalFadeIn 0.3s ease;
         }
 
+        .modal-overlay.memorize {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-overlay.memorize .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-lg);
+        }
+
         @keyframes modalFadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -716,6 +728,7 @@
             
             // Mostrar modal de memorización
             const memorizeModal = document.getElementById('memorizeModal');
+            memorizeModal.classList.add('memorize');
             memorizeModal.style.display = 'flex';
             
             // Contador regresivo
@@ -739,6 +752,7 @@
             
             // Cerrar modal de memorización
             const memorizeModal = document.getElementById('memorizeModal');
+            memorizeModal.classList.remove('memorize');
             memorizeModal.style.display = 'none';
             
             board.classList.remove('memorize-phase');
@@ -867,6 +881,7 @@
             // Cerrar modales si están abiertos
             document.querySelectorAll('.modal-overlay').forEach(modal => {
                 modal.style.display = 'none';
+                modal.classList.remove('memorize');
             });
             
             board.innerHTML = "";
