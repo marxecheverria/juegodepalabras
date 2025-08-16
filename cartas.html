@@ -264,17 +264,17 @@
         }
 
         .found-card {
-            width: 45px;
-            height: 65px;
+            width: 40px;
+            height: 56px; /* Proporción 1:1.4 para mantener la forma rectangular */
             background: 
                 linear-gradient(135deg, #667eea 0%, #764ba2 100%),
                 radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-            border-radius: 12px;
+            border-radius: 8px;
             border: 2px solid #4c63d2;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1rem;
             box-shadow: 
                 0 4px 8px rgba(0, 0, 0, 0.2),
                 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -400,11 +400,11 @@
         .game-board {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 15px;
+            gap: 12px;
             width: 100%;
-            max-width: 600px;
-            aspect-ratio: 5 / 4;
-            padding: 15px;
+            max-width: 700px; /* Aumentado para acomodar cartas más anchas */
+            aspect-ratio: 5 / 5.6; /* Ajustado para cartas rectangulares */
+            padding: 20px;
             background-color: var(--bg-glass);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-md);
@@ -415,7 +415,7 @@
         .card {
             width: 100%;
             height: 0;
-            padding-bottom: 100%;
+            padding-bottom: 140%; /* Cambio de 100% (cuadrado) a 140% (rectangular vertical) */
             perspective: 1000px;
             cursor: pointer;
             position: relative;
