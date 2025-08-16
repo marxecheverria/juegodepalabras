@@ -266,25 +266,43 @@
         .found-card {
             width: 45px;
             height: 65px;
-            background: var(--gradient-success);
-            border-radius: var(--radius-sm);
+            background: linear-gradient(135deg, var(--success) 0%, var(--accent) 100%);
+            border-radius: 8px;
             border: 2px solid var(--success);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.1rem;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 
+                0 3px 6px rgba(0, 0, 0, 0.15),
+                0 2px 4px rgba(0, 0, 0, 0.1);
             transform: rotate(-5deg);
-            transition: var(--transition);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
+            overflow: hidden;
+        }
+
+        .found-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 50%, rgba(0, 0, 0, 0.05) 100%);
+            border-radius: 6px;
+            z-index: 1;
         }
 
         .found-card:nth-child(2n+1) { transform: rotate(-3deg); }
         .found-card:nth-child(2n+2) { transform: rotate(2deg); }
 
         .found-card:hover {
-            transform: rotate(0deg) scale(1.1);
+            transform: rotate(0deg) scale(1.15);
             z-index: 10;
+            box-shadow: 
+                0 6px 12px rgba(0, 0, 0, 0.2),
+                0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         /* Modales */
@@ -388,25 +406,52 @@
             padding-bottom: 100%;
             perspective: 1000px;
             cursor: pointer;
-            border-radius: 50%;
+            border-radius: 12px;
             position: relative;
-            box-shadow: var(--shadow-sm);
+            box-shadow: 
+                0 4px 8px rgba(0, 0, 0, 0.1),
+                0 2px 4px rgba(0, 0, 0, 0.06);
             background: var(--bg-card);
-            border: 4px solid var(--primary);
-            transition: var(--transition);
+            border: 2px solid var(--primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, transparent 50%, rgba(0, 0, 0, 0.05) 100%);
+            border-radius: 10px;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .card:hover {
-            transform: scale(1.05);
-            box-shadow: var(--shadow-glow);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 
+                0 12px 24px rgba(139, 157, 195, 0.3),
+                0 6px 12px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent);
+        }
+
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card-inner {
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            border-radius: 50%;
-            transition: transform 0.6s;
+            border-radius: 10px;
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
+            box-shadow: 
+                0 2px 4px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
         }
 
         .card.flip .card-inner {
@@ -418,30 +463,86 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            border-radius: 50%;
+            border-radius: 10px;
             backface-visibility: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 3.5em;
+            font-size: 3.2em;
             font-weight: bold;
             user-select: none;
+            box-shadow: 
+                inset 0 2px 4px rgba(0, 0, 0, 0.1),
+                inset 0 -2px 4px rgba(255, 255, 255, 0.1);
         }
 
         .card-front {
-            background: var(--gradient-primary);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: var(--bg-card);
             transform: rotateY(180deg);
+            border: 2px solid var(--primary-dark);
+        }
+
+        .card-front::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: 8px;
+            bottom: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            z-index: 1;
         }
 
         .card-back {
-            background: var(--gradient-secondary);
+            background: linear-gradient(135deg, var(--secondary) 0%, var(--primary) 100%);
             color: var(--bg-card);
+            font-size: 2.6em;
+            border: 2px solid var(--secondary-dark);
+            position: relative;
+        }
+
+        .card-back::before {
+            content: '🎰';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             font-size: 2.8em;
+            opacity: 0.9;
+        }
+
+        .card-back::after {
+            content: '';
+            position: absolute;
+            top: 6px;
+            left: 6px;
+            right: 6px;
+            bottom: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            z-index: 1;
         }
 
         .card.matched {
             visibility: hidden;
+            animation: cardMatched 0.6s ease-out forwards;
+        }
+
+        @keyframes cardMatched {
+            0% {
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.2) rotate(5deg);
+                opacity: 0.8;
+            }
+            100% {
+                transform: scale(0) rotate(10deg);
+                opacity: 0;
+            }
         }
 
         /* Botones de control */
