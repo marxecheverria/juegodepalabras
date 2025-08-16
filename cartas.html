@@ -264,15 +264,15 @@
         }
 
         .found-card {
-            width: 50px;
-            height: 70px;
+            width: 45px;
+            height: 65px;
             background: var(--gradient-success);
             border-radius: var(--radius-sm);
             border: 2px solid var(--success);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             box-shadow: var(--shadow-sm);
             transform: rotate(-5deg);
             transition: var(--transition);
@@ -541,7 +541,8 @@
         .memorize-indicator {
             position: absolute;
             top: 10px;
-            right: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             background: var(--gradient-primary);
             color: var(--bg-card);
             padding: var(--space-xs) var(--space-sm);
@@ -551,6 +552,7 @@
             z-index: 10;
             opacity: 0.9;
             animation: pulse 2s ease-in-out infinite;
+            white-space: nowrap;
         }
 
         /* Responsive */
@@ -745,7 +747,7 @@
             // Agregar indicador visual sutil
             const indicator = document.createElement('div');
             indicator.className = 'memorize-indicator';
-            indicator.textContent = '🧠 Memorizando...';
+            indicator.textContent = 'TIENES 10 SEGUNDOS PARA MEMORIZAR LAS CARTAS';
             board.appendChild(indicator);
             
             // No mostrar modal, solo mantener las cartas visibles por 10 segundos
@@ -855,8 +857,8 @@
                 initialMessage.remove();
             }
             
-            // Crear nueva fila si es necesario (cada fila contiene 2 pares = 4 cartas)
-            const currentRow = Math.floor(matchedPairs / 2);
+            // Crear nueva fila si es necesario (cada fila contiene 3 pares = 6 cartas)
+            const currentRow = Math.floor(matchedPairs / 3);
             let rowElement = foundCardsPile.querySelector(`.found-cards-row[data-row="${currentRow}"]`);
             
             if (!rowElement) {
