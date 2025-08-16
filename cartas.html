@@ -269,7 +269,7 @@
             background: 
                 linear-gradient(135deg, #667eea 0%, #764ba2 100%),
                 radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-            clip-path: polygon(15% 0%, 85% 0%, 100% 15%, 100% 85%, 85% 100%, 15% 100%, 0% 85%, 0% 15%);
+            border-radius: 12px;
             border: 2px solid #4c63d2;
             display: flex;
             align-items: center;
@@ -295,6 +295,7 @@
                 radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.15) 0%, transparent 50%),
                 linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.1) 50%, transparent 60%);
             z-index: 1;
+            border-radius: 10px;
         }
 
         .found-card::after {
@@ -419,8 +420,9 @@
             cursor: pointer;
             position: relative;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+            overflow: visible;
+            border-radius: 16px;
+            border: 3px solid #4c63d2;
         }
 
         .card::before {
@@ -436,11 +438,13 @@
             z-index: 1;
             opacity: 0;
             transition: opacity 0.3s ease;
+            border-radius: 13px;
         }
 
         .card:hover {
             transform: translateY(-12px) scale(1.08) rotate(2deg);
             filter: drop-shadow(0 20px 30px rgba(139, 157, 195, 0.4));
+            border-color: #e91e63;
         }
 
         .card:hover::before {
@@ -452,7 +456,9 @@
             top: 0; left: 0; right: 0; bottom: 0;
             transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
             transform-style: preserve-3d;
-            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+            border-radius: 13px;
+            width: 100%;
+            height: 100%;
         }
 
         .card.flip .card-inner {
@@ -471,7 +477,9 @@
             font-size: 3.2em;
             font-weight: bold;
             user-select: none;
-            clip-path: polygon(20% 0%, 80% 0%, 100% 20%, 100% 80%, 80% 100%, 20% 100%, 0% 80%, 0% 20%);
+            border-radius: 13px;
+            top: 0;
+            left: 0;
         }
 
         .card-front {
@@ -480,8 +488,8 @@
                 radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
             color: var(--bg-card);
             transform: rotateY(180deg);
-            border: 3px solid #4c63d2;
             position: relative;
+            z-index: 2;
         }
 
         .card-front::before {
@@ -498,29 +506,13 @@
             z-index: 1;
         }
 
-        .card-front::after {
-            content: '⭐';
-            position: absolute;
-            top: 10%;
-            right: 10%;
-            font-size: 1.2em;
-            opacity: 0.8;
-            z-index: 2;
-        }
-
         .card-back {
             background: 
-                linear-gradient(135deg, #f093fb 0%, #f5576c 100%),
-                repeating-linear-gradient(
-                    45deg,
-                    transparent,
-                    transparent 10px,
-                    rgba(255, 255, 255, 0.1) 10px,
-                    rgba(255, 255, 255, 0.1) 20px
-                );
+                linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
             color: var(--bg-card);
-            border: 3px solid #e91e63;
             position: relative;
+            transform: rotateY(0deg);
+            z-index: 1;
         }
 
         .card-back::before {
@@ -858,7 +850,7 @@
             card.innerHTML = `
                 <div class="card-inner">
                     <div class="card-front">${emoji}</div>
-                    <div class="card-back">🎰</div>
+                    <div class="card-back">🚀</div>
                 </div>
             `;
             card.dataset.emoji = emoji;
@@ -882,9 +874,6 @@
             indicator.className = 'memorize-indicator';
             indicator.textContent = 'TIENES 10 SEGUNDOS PARA MEMORIZAR LAS CARTAS';
             board.appendChild(indicator);
-            
-            // No mostrar modal, solo mantener las cartas visibles por 10 segundos
-            // para que el usuario pueda memorizarlas tranquilamente
             
             // Contador regresivo interno (10 segundos total)
             let countdown = 10;
