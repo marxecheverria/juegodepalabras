@@ -508,32 +508,47 @@
 
         .card-back {
             background: 
-                linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: var(--bg-card);
+                linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%);
+            color: var(--text-primary);
             position: relative;
             transform: rotateY(0deg);
             z-index: 1;
+            border: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .card-back::before {
-            content: '🚀';
+            content: '';
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            font-size: 2.8em;
-            opacity: 0.9;
+            width: 80px;
+            height: 80px;
+            background: 
+                radial-gradient(circle at center, #ffffff 0%, #f1f5f9 70%, #e2e8f0 100%);
+            border-radius: 50%;
+            border: 3px solid #cbd5e1;
+            box-shadow: 
+                inset 0 2px 4px rgba(255, 255, 255, 0.8),
+                0 2px 8px rgba(0, 0, 0, 0.1);
             z-index: 2;
         }
 
         .card-back::after {
-            content: '⚡';
+            content: '';
             position: absolute;
-            top: 15%;
-            left: 15%;
-            font-size: 1em;
-            opacity: 0.7;
-            z-index: 2;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: 
+                radial-gradient(circle at center, #64748b 0%, #475569 100%);
+            border-radius: 50%;
+            z-index: 3;
         }
 
         .card.matched {
