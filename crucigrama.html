@@ -247,16 +247,17 @@
         .word-item {
             background: var(--bg-card);
             color: var(--text-primary);
-            padding: var(--space-xs) var(--space-sm);
+            padding: var(--space-sm);
             border-radius: var(--radius-sm);
-            font-size: 1.1rem;
-            font-weight: 600;
+            font-size: 1rem;
+            font-weight: 500;
             border: 2px solid var(--bg-glass);
             transition: var(--transition);
             cursor: pointer;
             box-shadow: var(--shadow-sm);
-            text-align: center;
+            text-align: left;
             width: 100%;
+            line-height: 1.4;
         }
 
         .word-item:hover {
@@ -265,6 +266,11 @@
             transform: translateX(5px);
             box-shadow: var(--shadow-md);
             border-color: var(--accent);
+            cursor: pointer;
+        }
+
+        .word-item:active {
+            transform: translateX(3px) scale(0.98);
         }
 
         .word-item.found {
@@ -1152,19 +1158,69 @@
                     wordElement.className = 'word-item';
                 }
                 
-                // Mostrar solo la definición y la ubicación (NO la palabra)
+                // Mostrar definición y ubicación
                 const position = gameState.wordPositions[wordObj.word];
                 if (position) {
                     const colLetter = String.fromCharCode(65 + position.col);
                     const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
-                    wordElement.textContent = `${wordObj.definition} - Fila ${position.row + 1}, Col ${colLetter} (${direction})`;
+                    wordElement.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Fila ${position.row + 1}, Col ${colLetter} (${direction})
+                        </div>
+                    `;
                 } else {
-                    wordElement.textContent = `${wordObj.definition} - Ubicación no definida`;
+                    wordElement.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
+                            Ubicación no definida
+                        </div>
+                    `;
                 }
                 
                 wordElement.dataset.word = wordObj.word;
+                
+                // Agregar funcionalidad de navegación al hacer clic
+                wordElement.addEventListener('click', () => {
+                    navigateToWord(wordObj.word);
+                });
+                
                 elements.wordsList.appendChild(wordElement);
             });
+        }
+
+        function navigateToWord(word) {
+            const position = gameState.wordPositions[word];
+            if (!position) return;
+            
+            const { row, col, direction } = position;
+            
+            // Encontrar la primera celda de la palabra
+            const firstCell = elements.crucigramaGrid.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+            if (!firstCell) return;
+            
+            // Encontrar el input dentro de la celda
+            const input = firstCell.querySelector('input');
+            if (input) {
+                // Hacer scroll hasta la celda
+                firstCell.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center',
+                    inline: 'center'
+                });
+                
+                // Enfocar el input después de un pequeño delay para el scroll
+                setTimeout(() => {
+                    input.focus();
+                    input.select();
+                    
+                    // Resaltar temporalmente la celda
+                    firstCell.style.boxShadow = '0 0 20px var(--accent)';
+                    setTimeout(() => {
+                        firstCell.style.boxShadow = '';
+                    }, 2000);
+                }, 300);
+            }
         }
 
         function verifyGame() {
@@ -1238,10 +1294,12 @@
         }
 
         function newGame() {
+            // Detener el temporizador
             if (gameState.timerInterval) {
                 clearInterval(gameState.timerInterval);
             }
             
+            // Reiniciar completamente el estado del juego
             gameState = {
                 words: [],
                 foundWords: [],
@@ -1253,16 +1311,56 @@
                 wordPositions: {}
             };
             
+            // Limpiar el temporizador
             elements.timer.textContent = '00:00';
+            
+            // Limpiar la lista de palabras
             elements.wordsList.innerHTML = '';
             
-            // Cargar nuevas palabras
+            // Limpiar completamente la matriz del crucigrama
+            elements.crucigramaGrid.innerHTML = '';
+            
+            // Crear una nueva matriz vacía
+            createEmptyGrid();
+            
+            // Cargar nuevas palabras y iniciar nuevo juego
             loadWordsFromFile();
         }
 
         function restartGame() {
             closeModal('successModal');
-            newGame();
+            
+            // Detener el temporizador
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            // Reiniciar completamente el estado del juego
+            gameState = {
+                words: [],
+                foundWords: [],
+                grid: [],
+                timer: 0,
+                timerInterval: null,
+                isPaused: false,
+                gridSize: 15,
+                wordPositions: {}
+            };
+            
+            // Limpiar el temporizador
+            elements.timer.textContent = '00:00';
+            
+            // Limpiar la lista de palabras
+            elements.wordsList.innerHTML = '';
+            
+            // Limpiar completamente la matriz del crucigrama
+            elements.crucigramaGrid.innerHTML = '';
+            
+            // Crear una nueva matriz vacía
+            createEmptyGrid();
+            
+            // Cargar nuevas palabras y iniciar nuevo juego
+            loadWordsFromFile();
         }
 
         function gameWon() {
