@@ -1,0 +1,100 @@
+1. plátano: Fruta amarilla tropical.
+2. marte: Planeta rojo del sistema solar.
+3. parís: Capital de Francia.
+4. oro: Metal precioso de color amarillo.
+5. perro: Animal doméstico que ladra.
+6. manzana: Fruta roja, verde o amarilla.
+7. elefante: Mamífero terrestre de gran tamaño con trompa.
+8. balón: Objeto esférico usado en deportes.
+9. libro: Conjunto de hojas impresas encuadernadas.
+10. sol: Estrella que ilumina la Tierra.
+11. luna: Satélite natural de la Tierra.
+12. río: Corriente de agua natural.
+13. montaña: Elevación natural del terreno.
+14. casa: Lugar donde vive una familia.
+15. silla: Mueble para sentarse.
+16. mesa: Mueble para comer o trabajar.
+17. coche: Vehículo de transporte terrestre.
+18. tren: Transporte ferroviario.
+19. avión: Medio de transporte aéreo.
+20. barco: Medio de transporte acuático.
+21. gato: Animal doméstico que maúlla.
+22. pez: Animal acuático que nada.
+23. árbol: Planta de tallo leñoso.
+24. flor: Parte colorida de una planta.
+25. césped: Hierba que cubre el suelo.
+26. playa: Zona de arena junto al mar.
+27. arena: Granos finos de roca.
+28. mar: Gran masa de agua salada.
+29. río: Corriente de agua dulce.
+30. lago: Masa de agua rodeada de tierra.
+31. nube: Masa de vapor de agua.
+32. lluvia: Agua que cae del cielo.
+33. nieve: Precipitación de cristales de hielo.
+34. viento: Movimiento del aire.
+35. fuego: Combustión que produce luz y calor.
+36. tierra: Suelo donde crecen plantas.
+37. luna: Satélite natural que ilumina la noche.
+38. estrella: Cuerpo celeste que emite luz propia.
+39. cometa: Cuerpo celeste con cola luminosa.
+40. sol: Fuente de luz y calor.
+41. reloj: Objeto para medir el tiempo.
+42. calendario: Sistema de medir días y meses.
+43. teléfono: Dispositivo para comunicarse a distancia.
+44. computadora: Máquina para procesar información.
+45. teclado: Dispositivo para escribir en la computadora.
+46. ratón: Dispositivo para mover el cursor.
+47. pantalla: Superficie para mostrar imágenes.
+48. impresora: Dispositivo que produce copias en papel.
+49. cámara: Aparato para tomar fotos.
+50. radio: Aparato para escuchar sonido a distancia.
+51. televisión: Aparato para ver imágenes y sonido.
+52. altavoz: Dispositivo que emite sonido.
+53. micrófono: Dispositivo para capturar sonido.
+54. libro: Conjunto de hojas impresas.
+55. revista: Publicación periódica con artículos.
+56. periódico: Publicación diaria de noticias.
+57. cuaderno: Conjunto de hojas para escribir.
+58. lápiz: Instrumento para escribir o dibujar.
+59. bolígrafo: Instrumento con tinta para escribir.
+60. borrador: Material para borrar lo escrito.
+61. regla: Instrumento para medir o trazar líneas.
+62. tijera: Herramienta para cortar papel.
+63. pegamento: Sustancia que une objetos.
+64. pintura: Material para colorear superficies.
+65. pincel: Herramienta para aplicar pintura.
+66. lienzo: Tela para pintar.
+67. escultura: Obra artística tridimensional.
+68. música: Arte de sonidos organizados.
+69. canto: Acción de producir melodías con la voz.
+70. baile: Movimiento del cuerpo al ritmo de la música.
+71. guitarra: Instrumento de cuerdas.
+72. piano: Instrumento musical de teclas.
+73. violín: Instrumento de cuerda frotada.
+74. tambor: Instrumento de percusión.
+75. saxofón: Instrumento de viento.
+76. trompeta: Instrumento de viento metálico.
+77. flauta: Instrumento de viento de madera o metal.
+78. cine: Arte de crear películas.
+79. teatro: Arte de representar historias en un escenario.
+80. pintura: Arte de expresar con colores.
+81. escultura: Arte de modelar materiales.
+82. dibujo: Arte de representar con líneas.
+83. fotografía: Arte de capturar imágenes con cámara.
+84. deporte: Actividad física competitiva.
+85. fútbol: Deporte con balón y dos equipos.
+86. baloncesto: Deporte con balón y canasta.
+87. béisbol: Deporte con bate y pelota.
+88. tenis: Deporte con raqueta y pelota.
+89. natación: Deporte en el agua.
+90. ciclismo: Deporte sobre bicicleta.
+91. atletismo: Deporte con carreras y saltos.
+92. esquí: Deporte sobre nieve con esquís.
+93. yoga: Práctica física y mental.
+94. meditación: Técnica de concentración y relajación.
+95. lectura: Acción de interpretar palabras escritas.
+96. escritura: Acción de comunicar por medio de letras.
+97. ciencia: Estudio sistemático de la naturaleza.
+98. historia: Estudio de hechos pasados.
+99. geografía: Estudio de la Tierra y su superficie.
+100. matemáticas: Ciencia que estudia números y formas.
