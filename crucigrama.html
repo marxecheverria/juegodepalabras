@@ -677,22 +677,103 @@
 
         async function loadWordsFromFile() {
             try {
-                const response = await fetch('crucigrama.txt');
-                if (!response.ok) {
-                    throw new Error('No se pudo cargar crucigrama.txt');
-                }
-                
-                const content = await response.text();
-                const lines = content.split('\n').filter(line => line.trim());
-                const wordObjects = lines.map(line => {
-                    const parts = line.split(':');
-                    if (parts.length === 2) {
-                        const word = parts[0].replace(/^\d+\.\s*/, '').trim().toUpperCase();
-                        const definition = parts[1].trim();
-                        return { word, definition };
-                    }
-                    return null;
-                }).filter(obj => obj && obj.word.length > 0);
+                // Palabras predefinidas para funcionar sin servidor
+                const wordObjects = [
+                    { word: "PLATANO", definition: "Fruta amarilla tropical" },
+                    { word: "MARTE", definition: "Planeta rojo del sistema solar" },
+                    { word: "PARIS", definition: "Capital de Francia" },
+                    { word: "ORO", definition: "Metal precioso de color amarillo" },
+                    { word: "PERRO", definition: "Animal doméstico que ladra" },
+                    { word: "MANZANA", definition: "Fruta roja, verde o amarilla" },
+                    { word: "ELEFANTE", definition: "Mamífero terrestre de gran tamaño con trompa" },
+                    { word: "BALON", definition: "Objeto esférico usado en deportes" },
+                    { word: "LIBRO", definition: "Conjunto de hojas impresas encuadernadas" },
+                    { word: "SOL", definition: "Estrella que ilumina la Tierra" },
+                    { word: "LUNA", definition: "Satélite natural de la Tierra" },
+                    { word: "RIO", definition: "Corriente de agua natural" },
+                    { word: "MONTANA", definition: "Elevación natural del terreno" },
+                    { word: "CASA", definition: "Lugar donde vive una familia" },
+                    { word: "SILLA", definition: "Mueble para sentarse" },
+                    { word: "MESA", definition: "Mueble para comer o trabajar" },
+                    { word: "COCHE", definition: "Vehículo de transporte terrestre" },
+                    { word: "TREN", definition: "Transporte ferroviario" },
+                    { word: "AVION", definition: "Medio de transporte aéreo" },
+                    { word: "BARCO", definition: "Medio de transporte acuático" },
+                    { word: "GATO", definition: "Animal doméstico que maúlla" },
+                    { word: "PEZ", definition: "Animal acuático que nada" },
+                    { word: "ARBOL", definition: "Planta de tallo leñoso" },
+                    { word: "FLOR", definition: "Parte colorida de una planta" },
+                    { word: "CESPED", definition: "Hierba que cubre el suelo" },
+                    { word: "PLAYA", definition: "Zona de arena junto al mar" },
+                    { word: "ARENA", definition: "Granos finos de roca" },
+                    { word: "MAR", definition: "Gran masa de agua salada" },
+                    { word: "LAGO", definition: "Masa de agua rodeada de tierra" },
+                    { word: "NUBE", definition: "Masa de vapor de agua" },
+                    { word: "LLUVIA", definition: "Agua que cae del cielo" },
+                    { word: "NIEVE", definition: "Precipitación de cristales de hielo" },
+                    { word: "VIENTO", definition: "Movimiento del aire" },
+                    { word: "FUEGO", definition: "Combustión que produce luz y calor" },
+                    { word: "TIERRA", definition: "Suelo donde crecen plantas" },
+                    { word: "ESTRELLA", definition: "Cuerpo celeste que emite luz propia" },
+                    { word: "COMETA", definition: "Cuerpo celeste con cola luminosa" },
+                    { word: "RELOJ", definition: "Objeto para medir el tiempo" },
+                    { word: "CALENDARIO", definition: "Sistema de medir días y meses" },
+                    { word: "TELEFONO", definition: "Dispositivo para comunicarse a distancia" },
+                    { word: "COMPUTADORA", definition: "Máquina para procesar información" },
+                    { word: "TECLADO", definition: "Dispositivo para escribir en la computadora" },
+                    { word: "RATON", definition: "Dispositivo para mover el cursor" },
+                    { word: "PANTALLA", definition: "Superficie para mostrar imágenes" },
+                    { word: "IMPRESORA", definition: "Dispositivo que produce copias en papel" },
+                    { word: "CAMARA", definition: "Aparato para tomar fotos" },
+                    { word: "RADIO", definition: "Aparato para escuchar sonido a distancia" },
+                    { word: "TELEVISION", definition: "Aparato para ver imágenes y sonido" },
+                    { word: "ALTAVOZ", definition: "Dispositivo que emite sonido" },
+                    { word: "MICROFONO", definition: "Dispositivo para capturar sonido" },
+                    { word: "REVISTA", definition: "Publicación periódica con artículos" },
+                    { word: "PERIODICO", definition: "Publicación diaria de noticias" },
+                    { word: "CUADERNO", definition: "Conjunto de hojas para escribir" },
+                    { word: "LAPIZ", definition: "Instrumento para escribir o dibujar" },
+                    { word: "BOLIGRAFO", definition: "Instrumento con tinta para escribir" },
+                    { word: "BORRADOR", definition: "Material para borrar lo escrito" },
+                    { word: "REGLA", definition: "Instrumento para medir o trazar líneas" },
+                    { word: "TIJERA", definition: "Herramienta para cortar papel" },
+                    { word: "PEGAMENTO", definition: "Sustancia que une objetos" },
+                    { word: "PINTURA", definition: "Material para colorear superficies" },
+                    { word: "PINCEL", definition: "Herramienta para aplicar pintura" },
+                    { word: "LIENZO", definition: "Tela para pintar" },
+                    { word: "ESCULTURA", definition: "Obra artística tridimensional" },
+                    { word: "MUSICA", definition: "Arte de sonidos organizados" },
+                    { word: "CANTO", definition: "Acción de producir melodías con la voz" },
+                    { word: "BAILE", definition: "Movimiento del cuerpo al ritmo de la música" },
+                    { word: "GUITARRA", definition: "Instrumento de cuerdas" },
+                    { word: "PIANO", definition: "Instrumento musical de teclas" },
+                    { word: "VIOLIN", definition: "Instrumento de cuerda frotada" },
+                    { word: "TAMBOR", definition: "Instrumento de percusión" },
+                    { word: "SAXOFON", definition: "Instrumento de viento" },
+                    { word: "TROMPETA", definition: "Instrumento de viento metálico" },
+                    { word: "FLAUTA", definition: "Instrumento de viento de madera o metal" },
+                    { word: "CINE", definition: "Arte de crear películas" },
+                    { word: "TEATRO", definition: "Arte de representar historias en un escenario" },
+                    { word: "DIBUJO", definition: "Arte de representar con líneas" },
+                    { word: "FOTOGRAFIA", definition: "Arte de capturar imágenes con cámara" },
+                    { word: "DEPORTE", definition: "Actividad física competitiva" },
+                    { word: "FUTBOL", definition: "Deporte con balón y dos equipos" },
+                    { word: "BALONCESTO", definition: "Deporte con balón y canasta" },
+                    { word: "BEISBOL", definition: "Deporte con bate y pelota" },
+                    { word: "TENIS", definition: "Deporte con raqueta y pelota" },
+                    { word: "NATACION", definition: "Deporte en el agua" },
+                    { word: "CICLISMO", definition: "Deporte sobre bicicleta" },
+                    { word: "ATLETISMO", definition: "Deporte con carreras y saltos" },
+                    { word: "ESQUI", definition: "Deporte sobre nieve con esquís" },
+                    { word: "YOGA", definition: "Práctica física y mental" },
+                    { word: "MEDITACION", definition: "Técnica de concentración y relajación" },
+                    { word: "LECTURA", definition: "Acción de interpretar palabras escritas" },
+                    { word: "ESCRITURA", definition: "Acción de comunicar por medio de letras" },
+                    { word: "CIENCIA", definition: "Estudio sistemático de la naturaleza" },
+                    { word: "HISTORIA", definition: "Estudio de hechos pasados" },
+                    { word: "GEOGRAFIA", definition: "Estudio de la Tierra y su superficie" },
+                    { word: "MATEMATICAS", definition: "Ciencia que estudia números y formas" }
+                ];
                 
                 if (wordObjects.length >= 5) {
                     // Seleccionar 5 palabras al azar
@@ -702,11 +783,11 @@
                     // Iniciar el juego
                     startGame(selectedWords);
                 } else {
-                    showError('El archivo crucigrama.txt debe contener al menos 5 palabras válidas.');
+                    showError('No hay suficientes palabras disponibles.');
                 }
             } catch (error) {
-                console.error('Error al cargar crucigrama.txt:', error);
-                showError('Error al cargar crucigrama.txt. Asegúrate de que el archivo esté en la misma carpeta.');
+                console.error('Error al cargar palabras:', error);
+                showError('Error al cargar las palabras del juego.');
             }
         }
 
