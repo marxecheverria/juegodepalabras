@@ -394,6 +394,8 @@
         .grid-cell input:focus {
             background: var(--bg-glass);
             border-radius: var(--radius-sm);
+            outline: 2px solid var(--accent);
+            outline-offset: 2px;
         }
 
         .grid-cell.correct {
@@ -696,6 +698,10 @@
             wordPositions: {} // Para rastrear la posición de cada palabra
         };
 
+        // Variable para rastrear palabras usadas recientemente
+        let recentlyUsedWords = [];
+        const maxRecentlyUsed = 30; // Mantener registro de las últimas 30 palabras usadas
+
         // Elementos del DOM
         const elements = {
             crucigramaGrid: document.getElementById('crucigramaGrid'),
@@ -721,8 +727,59 @@
 
         async function loadWordsFromFile() {
             try {
-                // Palabras predefinidas para funcionar sin servidor
-                const wordObjects = [
+                // Cargar palabras desde el archivo JSON externo
+                const response = await fetch('words.json');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Extraer todas las palabras de todas las categorías
+                let allWords = [];
+                for (const category in data.categories) {
+                    allWords = allWords.concat(data.categories[category]);
+                }
+                
+                if (allWords.length >= 10) {
+                    // Agregar un poco de aleatoriedad adicional mezclando las categorías
+                    const categoryKeys = Object.keys(data.categories);
+                    for (let i = categoryKeys.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [categoryKeys[i], categoryKeys[j]] = [categoryKeys[j], categoryKeys[i]];
+                    }
+                    
+                    // Reconstruir el array mezclando las categorías
+                    allWords = [];
+                    for (const category of categoryKeys) {
+                        allWords = allWords.concat(data.categories[category]);
+                    }
+                    
+                    // Seleccionar 10 palabras al azar
+                    const selectedWords = getRandomWords(allWords, 10);
+                    
+                    // Log para debugging - mostrar las palabras seleccionadas
+                    console.log('Total de palabras disponibles:', allWords.length);
+                    console.log('Categorías disponibles:', categoryKeys);
+                    console.log('Palabras seleccionadas para esta partida:');
+                    selectedWords.forEach((wordObj, index) => {
+                        console.log(`${index + 1}. ${wordObj.word} - ${wordObj.definition}`);
+                    });
+                    
+                    // Mostrar estadísticas de variedad
+                    logGameStatistics(selectedWords, data);
+                    
+                    // Iniciar el juego
+                    startGame(selectedWords);
+                } else {
+                    showError('No hay suficientes palabras disponibles en el archivo JSON.');
+                }
+            } catch (error) {
+                console.error('Error al cargar palabras desde JSON:', error);
+                
+                // Fallback: usar palabras predefinidas si falla la carga del JSON
+                console.log('Usando palabras predefinidas como fallback...');
+                const fallbackWords = [
                     { word: "PLATANO", definition: "Fruta amarilla tropical" },
                     { word: "MARTE", definition: "Planeta rojo del sistema solar" },
                     { word: "PARIS", definition: "Capital de Francia" },
@@ -732,112 +789,49 @@
                     { word: "ELEFANTE", definition: "Mamífero terrestre de gran tamaño con trompa" },
                     { word: "BALON", definition: "Objeto esférico usado en deportes" },
                     { word: "LIBRO", definition: "Conjunto de hojas impresas encuadernadas" },
-                    { word: "SOL", definition: "Estrella que ilumina la Tierra" },
-                    { word: "LUNA", definition: "Satélite natural de la Tierra" },
-                    { word: "RIO", definition: "Corriente de agua natural" },
-                    { word: "MONTANA", definition: "Elevación natural del terreno" },
-                    { word: "CASA", definition: "Lugar donde vive una familia" },
-                    { word: "SILLA", definition: "Mueble para sentarse" },
-                    { word: "MESA", definition: "Mueble para comer o trabajar" },
-                    { word: "COCHE", definition: "Vehículo de transporte terrestre" },
-                    { word: "TREN", definition: "Transporte ferroviario" },
-                    { word: "AVION", definition: "Medio de transporte aéreo" },
-                    { word: "BARCO", definition: "Medio de transporte acuático" },
-                    { word: "GATO", definition: "Animal doméstico que maúlla" },
-                    { word: "PEZ", definition: "Animal acuático que nada" },
-                    { word: "ARBOL", definition: "Planta de tallo leñoso" },
-                    { word: "FLOR", definition: "Parte colorida de una planta" },
-                    { word: "CESPED", definition: "Hierba que cubre el suelo" },
-                    { word: "PLAYA", definition: "Zona de arena junto al mar" },
-                    { word: "ARENA", definition: "Granos finos de roca" },
-                    { word: "MAR", definition: "Gran masa de agua salada" },
-                    { word: "LAGO", definition: "Masa de agua rodeada de tierra" },
-                    { word: "NUBE", definition: "Masa de vapor de agua" },
-                    { word: "LLUVIA", definition: "Agua que cae del cielo" },
-                    { word: "NIEVE", definition: "Precipitación de cristales de hielo" },
-                    { word: "VIENTO", definition: "Movimiento del aire" },
-                    { word: "FUEGO", definition: "Combustión que produce luz y calor" },
-                    { word: "TIERRA", definition: "Suelo donde crecen plantas" },
-                    { word: "ESTRELLA", definition: "Cuerpo celeste que emite luz propia" },
-                    { word: "COMETA", definition: "Cuerpo celeste con cola luminosa" },
-                    { word: "RELOJ", definition: "Objeto para medir el tiempo" },
-                    { word: "CALENDARIO", definition: "Sistema de medir días y meses" },
-                    { word: "TELEFONO", definition: "Dispositivo para comunicarse a distancia" },
-                    { word: "COMPUTADORA", definition: "Máquina para procesar información" },
-                    { word: "TECLADO", definition: "Dispositivo para escribir en la computadora" },
-                    { word: "RATON", definition: "Dispositivo para mover el cursor" },
-                    { word: "PANTALLA", definition: "Superficie para mostrar imágenes" },
-                    { word: "IMPRESORA", definition: "Dispositivo que produce copias en papel" },
-                    { word: "CAMARA", definition: "Aparato para tomar fotos" },
-                    { word: "RADIO", definition: "Aparato para escuchar sonido a distancia" },
-                    { word: "TELEVISION", definition: "Aparato para ver imágenes y sonido" },
-                    { word: "ALTAVOZ", definition: "Dispositivo que emite sonido" },
-                    { word: "MICROFONO", definition: "Dispositivo para capturar sonido" },
-                    { word: "REVISTA", definition: "Publicación periódica con artículos" },
-                    { word: "PERIODICO", definition: "Publicación diaria de noticias" },
-                    { word: "CUADERNO", definition: "Conjunto de hojas para escribir" },
-                    { word: "LAPIZ", definition: "Instrumento para escribir o dibujar" },
-                    { word: "BOLIGRAFO", definition: "Instrumento con tinta para escribir" },
-                    { word: "BORRADOR", definition: "Material para borrar lo escrito" },
-                    { word: "REGLA", definition: "Instrumento para medir o trazar líneas" },
-                    { word: "TIJERA", definition: "Herramienta para cortar papel" },
-                    { word: "PEGAMENTO", definition: "Sustancia que une objetos" },
-                    { word: "PINTURA", definition: "Material para colorear superficies" },
-                    { word: "PINCEL", definition: "Herramienta para aplicar pintura" },
-                    { word: "LIENZO", definition: "Tela para pintar" },
-                    { word: "ESCULTURA", definition: "Obra artística tridimensional" },
-                    { word: "MUSICA", definition: "Arte de sonidos organizados" },
-                    { word: "CANTO", definition: "Acción de producir melodías con la voz" },
-                    { word: "BAILE", definition: "Movimiento del cuerpo al ritmo de la música" },
-                    { word: "GUITARRA", definition: "Instrumento de cuerdas" },
-                    { word: "PIANO", definition: "Instrumento musical de teclas" },
-                    { word: "VIOLIN", definition: "Instrumento de cuerda frotada" },
-                    { word: "TAMBOR", definition: "Instrumento de percusión" },
-                    { word: "SAXOFON", definition: "Instrumento de viento" },
-                    { word: "TROMPETA", definition: "Instrumento de viento metálico" },
-                    { word: "FLAUTA", definition: "Instrumento de viento de madera o metal" },
-                    { word: "CINE", definition: "Arte de crear películas" },
-                    { word: "TEATRO", definition: "Arte de representar historias en un escenario" },
-                    { word: "DIBUJO", definition: "Arte de representar con líneas" },
-                    { word: "FOTOGRAFIA", definition: "Arte de capturar imágenes con cámara" },
-                    { word: "DEPORTE", definition: "Actividad física competitiva" },
-                    { word: "FUTBOL", definition: "Deporte con balón y dos equipos" },
-                    { word: "BALONCESTO", definition: "Deporte con balón y canasta" },
-                    { word: "BEISBOL", definition: "Deporte con bate y pelota" },
-                    { word: "TENIS", definition: "Deporte con raqueta y pelota" },
-                    { word: "NATACION", definition: "Deporte en el agua" },
-                    { word: "CICLISMO", definition: "Deporte sobre bicicleta" },
-                    { word: "ATLETISMO", definition: "Deporte con carreras y saltos" },
-                    { word: "ESQUI", definition: "Deporte sobre nieve con esquís" },
-                    { word: "YOGA", definition: "Práctica física y mental" },
-                    { word: "MEDITACION", definition: "Técnica de concentración y relajación" },
-                    { word: "LECTURA", definition: "Acción de interpretar palabras escritas" },
-                    { word: "ESCRITURA", definition: "Acción de comunicar por medio de letras" },
-                    { word: "CIENCIA", definition: "Estudio sistemático de la naturaleza" },
-                    { word: "HISTORIA", definition: "Estudio de hechos pasados" },
-                    { word: "GEOGRAFIA", definition: "Estudio de la Tierra y su superficie" },
-                    { word: "MATEMATICAS", definition: "Ciencia que estudia números y formas" }
+                    { word: "SOL", definition: "Estrella que ilumina la Tierra" }
                 ];
                 
-                if (wordObjects.length >= 10) {
-                    // Seleccionar 10 palabras al azar
-                    const selectedWords = getRandomWords(wordObjects, 10);
-                    console.log('Palabras seleccionadas:', selectedWords);
-                    
-                    // Iniciar el juego
-                    startGame(selectedWords);
-                } else {
-                    showError('No hay suficientes palabras disponibles.');
-                }
-            } catch (error) {
-                console.error('Error al cargar palabras:', error);
-                showError('Error al cargar las palabras del juego.');
+                startGame(fallbackWords);
             }
         }
 
         function getRandomWords(wordObjects, count) {
-            const shuffled = [...wordObjects].sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, count);
+            // Crear una copia del array para no modificar el original
+            let availableWords = [...wordObjects];
+            
+            // Filtrar palabras recientemente usadas para mayor variedad
+            if (recentlyUsedWords.length > 0) {
+                availableWords = availableWords.filter(wordObj => 
+                    !recentlyUsedWords.includes(wordObj.word)
+                );
+                
+                // Si no hay suficientes palabras disponibles, usar todas
+                if (availableWords.length < count) {
+                    console.log('No hay suficientes palabras sin usar, reseteando historial...');
+                    recentlyUsedWords = [];
+                    availableWords = [...wordObjects];
+                }
+            }
+            
+            // Implementar el algoritmo Fisher-Yates shuffle para mezcla verdaderamente aleatoria
+            for (let i = availableWords.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [availableWords[i], availableWords[j]] = [availableWords[j], availableWords[i]];
+            }
+            
+            // Seleccionar las palabras
+            const selectedWords = availableWords.slice(0, count);
+            
+            // Agregar las palabras seleccionadas al historial de uso reciente
+            selectedWords.forEach(wordObj => {
+                recentlyUsedWords.push(wordObj.word);
+                if (recentlyUsedWords.length > maxRecentlyUsed) {
+                    recentlyUsedWords.shift(); // Remover la palabra más antigua
+                }
+            });
+            
+            return selectedWords;
         }
 
         function showError(message) {
@@ -893,6 +887,9 @@
             elements.newGameBtn.addEventListener('click', newGame);
             elements.pauseBtn.addEventListener('click', togglePause);
             elements.restartBtn.addEventListener('click', restartGame);
+
+            // Event listeners para la navegación con las flechas del teclado
+            elements.crucigramaGrid.addEventListener('keydown', handleKeyNavigation);
         }
 
         function startGame(words) {
@@ -1020,6 +1017,7 @@
                     input.dataset.row = row;
                     input.dataset.col = col;
                     input.addEventListener('input', handleInput);
+                    input.addEventListener('keydown', handleKeyNavigation); // Agregar listener para la navegación
                     cell.appendChild(input);
                 }
             });
@@ -1030,10 +1028,11 @@
             const value = input.value.toUpperCase();
             
             if (value && value.length === 1) {
-                // Mover al siguiente input
-                const nextInput = findNextInput(input);
+                // Mover al siguiente input en la dirección correcta de la palabra
+                const nextInput = findNextInputInWordDirection(input);
                 if (nextInput) {
                     nextInput.focus();
+                    nextInput.select(); // Seleccionar el texto para facilitar la escritura
                 }
                 
                 // Verificar si se completó alguna palabra
@@ -1051,6 +1050,43 @@
             
             if (currentIndex < inputs.length - 1) {
                 return inputs[currentIndex + 1];
+            }
+            
+            return null;
+        }
+
+        function findNextInputInWordDirection(currentInput) {
+            const currentRow = parseInt(currentInput.dataset.row);
+            const currentCol = parseInt(currentInput.dataset.col);
+            
+            // Buscar la palabra a la que pertenece esta celda
+            for (const wordObj of gameState.words) {
+                const position = gameState.wordPositions[wordObj.word];
+                if (position) {
+                    const { row, col, direction } = position;
+                    
+                    if (direction === 'horizontal') {
+                        // Verificar si la celda actual está en esta palabra horizontal
+                        if (row === currentRow && col <= currentCol && col + wordObj.word.length > currentCol) {
+                            // Buscar la siguiente celda a la derecha
+                            const nextCol = currentCol + 1;
+                            if (nextCol < col + wordObj.word.length) {
+                                return elements.crucigramaGrid.querySelector(`input[data-row="${currentRow}"][data-col="${nextCol}"]`);
+                            }
+                            break;
+                        }
+                    } else {
+                        // Verificar si la celda actual está en esta palabra vertical
+                        if (col === currentCol && row <= currentRow && row + wordObj.word.length > currentRow) {
+                            // Buscar la siguiente celda abajo
+                            const nextRow = currentRow + 1;
+                            if (nextRow < row + wordObj.word.length) {
+                                return elements.crucigramaGrid.querySelector(`input[data-row="${nextRow}"][data-col="${currentCol}"]`);
+                            }
+                            break;
+                        }
+                    }
+                }
             }
             
             return null;
@@ -1164,22 +1200,24 @@
                     wordElement.className = 'word-item';
                 }
                 
-                // Mostrar definición y ubicación
+                // Mostrar definición, número de letras y ubicación
                 const position = gameState.wordPositions[wordObj.word];
                 if (position) {
                     const colLetter = String.fromCharCode(65 + position.col);
                     const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
+                    const letterCount = wordObj.word.length;
                     wordElement.innerHTML = `
                         <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
-                            Fila ${position.row + 1}, Col ${colLetter} (${direction})
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2px;">
+                            ${letterCount} letra${letterCount !== 1 ? 's' : ''} - Fila ${position.row + 1}, Col ${colLetter} (${direction})
                         </div>
                     `;
                 } else {
+                    const letterCount = wordObj.word.length;
                     wordElement.innerHTML = `
                         <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
-                        <div style="font-size: 0.9rem; color: var(--text-secondary);">
-                            Ubicación no definida
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2px;">
+                            ${letterCount} letra${letterCount !== 1 ? 's' : ''} - Ubicación no definida
                         </div>
                     `;
                 }
@@ -1267,23 +1305,26 @@
             
             const wordObj = unfoundWords[0];
             const word = wordObj.word;
+            const firstLetter = word[0];
             
-            // Encontrar una letra de la palabra en la matriz
-            for (let i = 0; i < 15; i++) {
-                for (let j = 0; j < 15; j++) {
-                    if (gameState.grid[i][j] === word[0]) {
-                        const cell = elements.crucigramaGrid.querySelector(`[data-row="${i}"][data-col="${j}"]`);
-                        if (cell) {
-                            cell.style.boxShadow = '0 0 20px var(--accent)';
-                            setTimeout(() => cell.style.boxShadow = '', 3000);
-                            showInfo(`Pista: La palabra "${word}" comienza con la letra "${word[0]}"`);
-                            return;
-                        }
-                    }
+            // Encontrar la primera celda de la palabra en la matriz
+            const position = gameState.wordPositions[word];
+            if (position) {
+                const { row, col } = position;
+                const cell = elements.crucigramaGrid.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+                if (cell) {
+                    // Resaltar la primera celda
+                    cell.style.boxShadow = '0 0 20px var(--accent)';
+                    setTimeout(() => cell.style.boxShadow = '', 3000);
+                    
+                    // Mostrar solo la primera letra como pista
+                    const colLetter = String.fromCharCode(65 + col);
+                    const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
+                    showInfo(`Pista: La palabra "${wordObj.definition}" comienza con la letra "${firstLetter}" en Fila ${row + 1}, Col ${colLetter} (${direction})`);
                 }
+            } else {
+                showInfo('No se pudo encontrar una pista para esta palabra.');
             }
-            
-            showInfo('No se pudo encontrar una pista para esta palabra.');
         }
 
         function togglePause() {
@@ -1403,6 +1444,28 @@
             cleanGrid();
         }
 
+        function logGameStatistics(selectedWords, allWords) {
+            // Mostrar estadísticas de variedad
+            const categories = {};
+            selectedWords.forEach(wordObj => {
+                // Determinar la categoría basándose en la definición o palabra
+                let category = 'general';
+                for (const cat in allWords.categories || {}) {
+                    if (allWords.categories[cat].some(w => w.word === wordObj.word)) {
+                        category = cat;
+                        break;
+                    }
+                }
+                categories[category] = (categories[category] || 0) + 1;
+            });
+            
+            console.log('📊 Estadísticas de la partida:');
+            console.log('Total de palabras disponibles:', allWords.length || 'N/A');
+            console.log('Palabras recientemente usadas:', recentlyUsedWords.length);
+            console.log('Distribución por categorías:', categories);
+            console.log('---');
+        }
+
         // Cerrar modales con Escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') {
@@ -1420,6 +1483,73 @@
                 }
             });
         });
+
+        function handleKeyNavigation(e) {
+            const input = e.target;
+            const currentRow = parseInt(input.dataset.row);
+            const currentCol = parseInt(input.dataset.col);
+            
+            let nextInput = null;
+            
+            switch (e.key) {
+                case 'ArrowLeft':
+                    // Buscar input a la izquierda
+                    if (currentCol > 0) {
+                        nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow}"][data-col="${currentCol - 1}"]`);
+                    }
+                    break;
+                    
+                case 'ArrowRight':
+                    // Buscar input a la derecha
+                    if (currentCol < 14) {
+                        nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow}"][data-col="${currentCol + 1}"]`);
+                    }
+                    break;
+                    
+                case 'ArrowUp':
+                    // Buscar input arriba
+                    if (currentRow > 0) {
+                        nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow - 1}"][data-col="${currentCol}"]`);
+                    }
+                    break;
+                    
+                case 'ArrowDown':
+                    // Buscar input abajo
+                    if (currentRow < 14) {
+                        nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow + 1}"][data-col="${currentCol}"]`);
+                    }
+                    break;
+                    
+                case 'Backspace':
+                    // Si la celda está vacía, mover a la celda anterior
+                    if (input.value === '') {
+                        if (currentCol > 0) {
+                            nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow}"][data-col="${currentCol - 1}"]`);
+                        } else if (currentRow > 0) {
+                            nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow - 1}"][data-col="14"]`);
+                        }
+                    }
+                    break;
+                    
+                case 'Delete':
+                    // Si la celda está vacía, mover a la celda anterior
+                    if (input.value === '') {
+                        if (currentCol > 0) {
+                            nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow}"][data-col="${currentCol - 1}"]`);
+                        } else if (currentRow > 0) {
+                            nextInput = elements.crucigramaGrid.querySelector(`input[data-row="${currentRow - 1}"][data-col="14"]`);
+                        }
+                    }
+                    break;
+            }
+            
+            if (nextInput) {
+                e.preventDefault();
+                nextInput.focus();
+                nextInput.select();
+            }
+        }
     </script>
 </body>
 </html>
+

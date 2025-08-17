@@ -1,0 +1,28 @@
+{
+  "gameSettings": {
+    "wordsPerGame": 10,
+    "gridSize": 15,
+    "maxWordLength": 12,
+    "minWordLength": 3,
+    "difficulty": "medium",
+    "categories": ["animales", "comida", "deportes", "profesiones", "tecnologia", "naturaleza", "transporte", "musica", "arte", "ciencia", "geografia"],
+    "excludedCategories": [],
+    "wordSelection": "random",
+    "allowOverlap": true,
+    "maxAttempts": 200
+  },
+  "uiSettings": {
+    "showTimer": true,
+    "showHints": true,
+    "showWordCount": true,
+    "showCategory": false,
+    "theme": "modern",
+    "animations": true
+  },
+  "scoring": {
+    "pointsPerWord": 100,
+    "timeBonus": true,
+    "hintPenalty": 25,
+    "bonusMultiplier": 1.5
+  }
+}
