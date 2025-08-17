@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crucigrama Elite - Juego de Palabras Avanzado</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de colores modernos y suaves */
+            --primary: #8B9DC3;
+            --primary-dark: #6B7A9A;
+            --secondary: #D4A5A5;
+            --accent: #E6B17A;
+            --success: #9CAF88;
+            --warning: #D4A574;
+            --error: #C4A484;
+            
+            /* Colores de fondo modernos */
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #F1F5F9;
+            --bg-tertiary: #E2E8F0;
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(139, 157, 195, 0.1);
+            
+            /* Colores de texto modernos */
+            --text-primary: #1E293B;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            
+            /* Gradientes modernos y suaves */
+            --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
+            --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
+            --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
+            
+            /* Sombras modernas y suaves */
+            --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
+            --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
+            --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
+            --shadow-glow: 0 0 20px rgba(139, 157, 195, 0.3);
+            
+            /* Espaciado */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            
+            /* Bordes */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 32px;
+            
+            /* Transiciones */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo animado moderno con partículas suaves */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 157, 195, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 165, 165, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(230, 177, 122, 0.04) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        /* Contenedor principal */
+        .game-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--space-sm);
+            min-height: 100vh;
+        }
+
+        /* Header del juego */
+        .game-header {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-bottom: var(--space-lg);
+            position: relative;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bg-glass);
+        }
+
+        .game-title {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 4rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: var(--space-sm);
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            text-align: center;
+        }
+
+        .game-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 4px;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-sm);
+            filter: blur(2px);
+        }
+
+        /* Panel principal del juego */
+        .game-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-md);
+            border: 1px solid var(--bg-glass);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        /* Layout horizontal del juego */
+        .game-layout {
+            display: flex;
+            gap: var(--space-md);
+            align-items: flex-start;
+            margin-top: var(--space-md);
+        }
+
+        /* Panel izquierdo: Temporizador y Lista de palabras */
+        .left-panel {
+            flex: 0 0 250px;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        /* Panel central: Matriz del crucigrama */
+        .center-panel {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: var(--space-md);
+            min-height: 600px;
+        }
+
+        /* Panel derecho: Botones de control */
+        .right-panel {
+            flex: 0 0 180px;
+        }
+
+        .sidebar-section {
+            margin-bottom: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--bg-glass);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .sidebar-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            text-align: center;
+        }
+
+        /* Temporizador */
+        .timer-display {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 3px;
+            text-shadow: 2px 2px 4px rgba(139, 157, 195, 0.3);
+            background: var(--bg-card);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            border: 2px solid var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Lista de palabras */
+        .words-list {
+            max-height: 300px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+        }
+
+        .word-item {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: var(--space-xs) var(--space-sm);
+            border-radius: var(--radius-sm);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: 2px solid var(--bg-glass);
+            transition: var(--transition);
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            width: 100%;
+        }
+
+        .word-item:hover {
+            background: var(--primary);
+            color: var(--bg-card);
+            transform: translateX(5px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .word-item.found {
+            background: var(--gradient-success);
+            color: var(--text-primary);
+            text-decoration: line-through;
+            opacity: 0.8;
+        }
+
+        /* Matriz del crucigrama */
+        .crucigrama-grid {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            gap: 2px;
+            background: var(--bg-tertiary);
+            padding: var(--space-lg);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bg-glass);
+            position: relative;
+            overflow: hidden;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .crucigrama-grid::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(37, 99, 235, 0.08), transparent);
+            animation: gridShine 3s ease-in-out infinite;
+        }
+
+        @keyframes gridShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .grid-cell {
+            aspect-ratio: 1;
+            min-width: 35px;
+            min-height: 35px;
+            background: var(--bg-card);
+            border: 2px solid var(--bg-glass);
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .grid-cell:hover {
+            background: var(--primary);
+            color: var(--bg-primary);
+            transform: scale(1.05);
+            box-shadow: var(--shadow-glow);
+            z-index: 10;
+        }
+
+        .grid-cell.block {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            cursor: default;
+        }
+
+        .grid-cell input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            outline: none;
+            background: transparent;
+            text-align: center;
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            text-transform: uppercase;
+            cursor: text;
+        }
+
+        .grid-cell input:focus {
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+        }
+
+        .grid-cell.correct {
+            background: var(--gradient-success);
+            color: var(--text-primary);
+            animation: cellCorrect 0.6s ease;
+        }
+
+        .grid-cell.incorrect {
+            background: var(--gradient-secondary);
+            color: var(--text-primary);
+            animation: cellIncorrect 0.6s ease;
+        }
+
+        @keyframes cellCorrect {
+            0% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        @keyframes cellIncorrect {
+            0% { transform: scale(1) rotate(0deg); }
+            25% { transform: scale(1.05) rotate(-2deg); }
+            75% { transform: scale(1.05) rotate(2deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Botones de control */
+        .control-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-sm);
+            margin-top: var(--space-lg);
+        }
+
+        .control-btn {
+            background: var(--gradient-primary);
+            color: var(--bg-card);
+            border: 2px solid var(--primary-dark);
+            padding: var(--space-sm) var(--space-md);
+            border-radius: var(--radius-md);
+            font-size: 1.2rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .control-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.25), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .control-btn:hover::before {
+            left: 100%;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--accent);
+        }
+
+        .control-btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-restart { background: var(--gradient-success); }
+        .btn-pause { background: var(--gradient-accent); }
+        .btn-hint { background: var(--gradient-secondary); }
+        .btn-new { background: var(--gradient-primary); }
+        .btn-verify { background: var(--gradient-accent); }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            animation: modalFadeIn 0.3s ease;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid var(--bg-glass);
+            box-shadow: var(--shadow-lg);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            background: var(--gradient-primary);
+            color: var(--text-primary);
+            border: none;
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .game-layout {
+                flex-direction: column;
+                gap: var(--space-lg);
+            }
+            
+            .left-panel, .right-panel {
+                flex: none;
+                width: 100%;
+            }
+            
+            .center-panel {
+                order: -1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-title {
+                font-size: 2.5rem;
+            }
+            
+            .game-container {
+                padding: var(--space-md);
+            }
+            
+            .game-layout {
+                gap: var(--space-md);
+            }
+            
+            .left-panel, .right-panel {
+                flex: none;
+                width: 100%;
+            }
+        }
+
+        /* Scrollbar personalizada */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Selección de texto */
+        ::selection {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Prevenir selección de texto */
+        .game-container, .game-panel, .crucigrama-grid {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Header del juego -->
+        <header class="game-header">
+            <h1 class="game-title">Crucigrama Elite</h1>
+        </header>
+
+        <!-- Panel principal del juego -->
+        <main class="game-panel">
+            <!-- Layout horizontal del juego -->
+            <div class="game-layout">
+                <!-- Panel izquierdo: Temporizador y Lista de palabras -->
+                <div class="left-panel">
+                    <!-- Temporizador -->
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">⏱️ Tiempo</div>
+                        <div class="timer-display" id="timer">00:00</div>
+                    </div>
+
+                    <!-- Lista de palabras -->
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">🎯 Palabras a encontrar</div>
+                        <div class="words-list" id="wordsList"></div>
+                    </div>
+                </div>
+
+                <!-- Panel central: Matriz del crucigrama -->
+                <div class="center-panel">
+                    <div class="crucigrama-grid" id="crucigramaGrid"></div>
+                </div>
+
+                <!-- Panel derecho: Botones de control -->
+                <div class="right-panel">
+                    <div class="sidebar-section">
+                        <div class="sidebar-title">🎮 Controles</div>
+                        <div class="control-buttons">
+                            <button class="control-btn btn-verify" id="verifyBtn">✅ Verificar</button>
+                            <button class="control-btn btn-hint" id="hintBtn">💡 Pista</button>
+                            <button class="control-btn btn-new" id="newGameBtn">🔄 Nuevo</button>
+                            <button class="control-btn btn-pause" id="pauseBtn">⏸️ Pausar</button>
+                            <button class="control-btn btn-restart" id="restartBtn">🏁 Reiniciar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modales -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <h2 class="modal-title">🏆 ¡Felicidades!</h2>
+            <p class="modal-text" id="successMessage"></p>
+            <button class="modal-btn" onclick="restartGame()">Jugar de nuevo</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <h2 class="modal-title">ℹ️ Información</h2>
+            <p class="modal-text" id="infoMessage"></p>
+            <button class="modal-btn" onclick="closeModal('infoModal')">Entendido</button>
+        </div>
+    </div>
+
+    <script>
+        // Variables del juego
+        let gameState = {
+            words: [],
+            foundWords: [],
+            grid: [],
+            timer: 0,
+            timerInterval: null,
+            isPaused: false,
+            gridSize: 15
+        };
+
+        // Elementos del DOM
+        const elements = {
+            crucigramaGrid: document.getElementById('crucigramaGrid'),
+            timer: document.getElementById('timer'),
+            wordsList: document.getElementById('wordsList'),
+            verifyBtn: document.getElementById('verifyBtn'),
+            hintBtn: document.getElementById('hintBtn'),
+            newGameBtn: document.getElementById('newGameBtn'),
+            pauseBtn: document.getElementById('pauseBtn'),
+            restartBtn: document.getElementById('restartBtn')
+        };
+
+        // Inicialización del juego
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            setupEventListeners();
+            loadWordsFromFile();
+        });
+
+        function initializeGame() {
+            createEmptyGrid();
+        }
+
+        async function loadWordsFromFile() {
+            try {
+                const response = await fetch('crucigrama.txt');
+                if (!response.ok) {
+                    throw new Error('No se pudo cargar crucigrama.txt');
+                }
+                
+                const content = await response.text();
+                const lines = content.split('\n').filter(line => line.trim());
+                const wordObjects = lines.map(line => {
+                    const parts = line.split(':');
+                    if (parts.length === 2) {
+                        const word = parts[0].replace(/^\d+\.\s*/, '').trim().toUpperCase();
+                        const definition = parts[1].trim();
+                        return { word, definition };
+                    }
+                    return null;
+                }).filter(obj => obj && obj.word.length > 0);
+                
+                if (wordObjects.length >= 5) {
+                    // Seleccionar 5 palabras al azar
+                    const selectedWords = getRandomWords(wordObjects, 5);
+                    console.log('Palabras seleccionadas:', selectedWords);
+                    
+                    // Iniciar el juego
+                    startGame(selectedWords);
+                } else {
+                    showError('El archivo crucigrama.txt debe contener al menos 5 palabras válidas.');
+                }
+            } catch (error) {
+                console.error('Error al cargar crucigrama.txt:', error);
+                showError('Error al cargar crucigrama.txt. Asegúrate de que el archivo esté en la misma carpeta.');
+            }
+        }
+
+        function getRandomWords(wordObjects, count) {
+            const shuffled = [...wordObjects].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        function showError(message) {
+            elements.wordsList.innerHTML = `
+                <div style="color: var(--error); text-align: center; padding: var(--space-md);">
+                    ❌ Error al cargar palabras<br>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function createEmptyGrid() {
+            elements.crucigramaGrid.innerHTML = '';
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    elements.crucigramaGrid.appendChild(cell);
+                }
+            }
+        }
+
+        function setupEventListeners() {
+            // Botones de control
+            elements.verifyBtn.addEventListener('click', verifyGame);
+            elements.hintBtn.addEventListener('click', showHint);
+            elements.newGameBtn.addEventListener('click', newGame);
+            elements.pauseBtn.addEventListener('click', togglePause);
+            elements.restartBtn.addEventListener('click', restartGame);
+        }
+
+        function startGame(words) {
+            gameState.words = [...words];
+            gameState.foundWords = [];
+            gameState.timer = 0;
+            
+            createGameGrid(words);
+            startTimer();
+            displayWords();
+        }
+
+        function createGameGrid(words) {
+            // Crear matriz vacía
+            gameState.grid = Array(gameState.gridSize).fill().map(() => Array(gameState.gridSize).fill(''));
+            
+            // Colocar palabras en la matriz
+            let placedWords = 0;
+            for (const wordObj of words) {
+                if (placeWordInGrid(wordObj.word)) {
+                    placedWords++;
+                }
+            }
+            
+            // Rellenar celdas vacías con letras aleatorias
+            fillEmptyCells();
+            
+            // Renderizar la matriz
+            renderGrid();
+            
+            if (placedWords === 0) {
+                showInfo('No se pudieron colocar las palabras. Intenta con palabras más cortas.');
+            }
+        }
+
+        function placeWordInGrid(word) {
+            const maxAttempts = 100;
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
+                const startRow = Math.floor(Math.random() * gameState.gridSize);
+                const startCol = Math.floor(Math.random() * gameState.gridSize);
+                
+                if (canPlaceWord(word, startRow, startCol, direction)) {
+                    placeWord(word, startRow, startCol, direction);
+                    return true;
+                }
+                attempts++;
+            }
+            return false;
+        }
+
+        function canPlaceWord(word, row, col, direction) {
+            if (direction === 'horizontal') {
+                if (col + word.length > gameState.gridSize) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (gameState.grid[row][col + i] && 
+                        gameState.grid[row][col + i] !== word[i]) {
+                        return false;
+                    }
+                }
+            } else {
+                if (row + word.length > gameState.gridSize) return false;
+                for (let i = 0; i < word.length; i++) {
+                    if (gameState.grid[row + i][col] && 
+                        gameState.grid[row + i][col] !== word[i]) {
+                        return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        function placeWord(word, row, col, direction) {
+            if (direction === 'horizontal') {
+                for (let i = 0; i < word.length; i++) {
+                    gameState.grid[row][col + i] = word[i];
+                }
+            } else {
+                for (let i = 0; i < word.length; i++) {
+                    gameState.grid[row + i][col] = word[i];
+                }
+            }
+        }
+
+        function fillEmptyCells() {
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    if (!gameState.grid[i][j]) {
+                        gameState.grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                    }
+                }
+            }
+        }
+
+        function renderGrid() {
+            elements.crucigramaGrid.innerHTML = '';
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'grid-cell';
+                    cell.dataset.row = i;
+                    cell.dataset.col = j;
+                    
+                    if (gameState.grid[i][j]) {
+                        const input = document.createElement('input');
+                        input.maxLength = 1;
+                        input.dataset.correcta = gameState.grid[i][j];
+                        input.dataset.row = i;
+                        input.dataset.col = j;
+                        input.addEventListener('input', handleInput);
+                        cell.appendChild(input);
+                    } else {
+                        cell.classList.add('block');
+                    }
+                    
+                    elements.crucigramaGrid.appendChild(cell);
+                }
+            }
+        }
+
+        function handleInput(e) {
+            const input = e.target;
+            const value = input.value.toUpperCase();
+            
+            if (value && value.length === 1) {
+                // Mover al siguiente input
+                const nextInput = findNextInput(input);
+                if (nextInput) {
+                    nextInput.focus();
+                }
+            }
+        }
+
+        function findNextInput(currentInput) {
+            const currentRow = parseInt(currentInput.dataset.row);
+            const currentCol = parseInt(currentInput.dataset.col);
+            
+            // Buscar el siguiente input en la misma fila
+            const inputs = Array.from(elements.crucigramaGrid.querySelectorAll('input'));
+            const currentIndex = inputs.indexOf(currentInput);
+            
+            if (currentIndex < inputs.length - 1) {
+                return inputs[currentIndex + 1];
+            }
+            
+            return null;
+        }
+
+        function startTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState.timer = 0;
+            gameState.timerInterval = setInterval(() => {
+                if (!gameState.isPaused) {
+                    gameState.timer++;
+                    updateTimer();
+                }
+            }, 1000);
+        }
+
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timer / 60);
+            const seconds = gameState.timer % 60;
+            elements.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            clearInterval(gameState.timerInterval);
+        }
+
+        function displayWords() {
+            elements.wordsList.innerHTML = '';
+            gameState.words.forEach(wordObj => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'word-item';
+                wordElement.textContent = `${wordObj.word} - ${wordObj.definition}`;
+                wordElement.dataset.word = wordObj.word;
+                elements.wordsList.appendChild(wordElement);
+            });
+        }
+
+        function verifyGame() {
+            const inputs = elements.crucigramaGrid.querySelectorAll('input');
+            let correctCount = 0;
+            let totalCount = 0;
+            
+            inputs.forEach(input => {
+                const value = input.value.toUpperCase();
+                const correct = input.dataset.correcta;
+                const cell = input.closest('.grid-cell');
+                
+                if (value === correct) {
+                    cell.classList.add('correct');
+                    cell.classList.remove('incorrect');
+                    correctCount++;
+                } else {
+                    cell.classList.add('incorrect');
+                    cell.classList.remove('correct');
+                }
+                totalCount++;
+            });
+            
+            // Verificar si se completó el juego
+            if (correctCount === totalCount) {
+                gameWon();
+            } else {
+                showInfo(`Verificación completada. ${correctCount} de ${totalCount} letras correctas.`);
+            }
+        }
+
+        function showHint() {
+            const unfoundWords = gameState.words.filter(w => !gameState.foundWords.includes(w.word));
+            if (unfoundWords.length === 0) {
+                showInfo('¡Todas las palabras han sido encontradas!');
+                return;
+            }
+            
+            const wordObj = unfoundWords[0];
+            const word = wordObj.word;
+            
+            // Encontrar una letra de la palabra en la matriz
+            for (let i = 0; i < gameState.gridSize; i++) {
+                for (let j = 0; j < gameState.gridSize; j++) {
+                    if (gameState.grid[i][j] === word[0]) {
+                        const cell = elements.crucigramaGrid.querySelector(`[data-row="${i}"][data-col="${j}"]`);
+                        if (cell) {
+                            cell.style.boxShadow = '0 0 20px var(--accent)';
+                            setTimeout(() => cell.style.boxShadow = '', 3000);
+                            showInfo(`Pista: La palabra "${word}" comienza con la letra "${word[0]}"`);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            showInfo('No se pudo encontrar una pista para esta palabra.');
+        }
+
+        function togglePause() {
+            gameState.isPaused = !gameState.isPaused;
+            if (gameState.isPaused) {
+                elements.pauseBtn.textContent = '▶️ Reanudar';
+                elements.pauseBtn.classList.remove('btn-pause');
+                elements.pauseBtn.classList.add('btn-restart');
+            } else {
+                elements.pauseBtn.textContent = '⏸️ Pausar';
+                elements.pauseBtn.classList.remove('btn-restart');
+                elements.pauseBtn.classList.add('btn-pause');
+            }
+        }
+
+        function newGame() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState = {
+                words: [],
+                foundWords: [],
+                grid: [],
+                timer: 0,
+                timerInterval: null,
+                isPaused: false,
+                gridSize: 15
+            };
+            
+            elements.timer.textContent = '00:00';
+            elements.wordsList.innerHTML = '';
+            
+            // Cargar nuevas palabras
+            loadWordsFromFile();
+        }
+
+        function restartGame() {
+            closeModal('successModal');
+            newGame();
+        }
+
+        function gameWon() {
+            stopTimer();
+            const timeString = elements.timer.textContent;
+            const message = `¡Has completado el crucigrama en ${timeString}!`;
+            
+            document.getElementById('successMessage').textContent = message;
+            showModal('successModal');
+        }
+
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showInfo(message) {
+            document.getElementById('infoMessage').textContent = message;
+            showModal('infoModal');
+        }
+
+        // Cerrar modales con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+
+        // Cerrar modales haciendo clic fuera
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
