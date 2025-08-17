@@ -277,7 +277,8 @@
         /* Matriz del crucigrama */
         .crucigrama-grid {
             display: grid;
-            grid-template-columns: repeat(15, 1fr);
+            grid-template-columns: repeat(16, 1fr); /* 16 para incluir numeración de columnas */
+            grid-template-rows: repeat(16, 1fr); /* 16 para incluir numeración de filas */
             gap: 2px;
             background: var(--bg-tertiary);
             padding: var(--space-lg);
@@ -305,6 +306,30 @@
             100% { transform: translateX(100%); }
         }
 
+        /* Celdas de numeración */
+        .grid-header, .grid-sidebar {
+            background: var(--primary);
+            color: var(--bg-card);
+            font-family: 'Space Grotesk', monospace;
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: var(--radius-sm);
+            border: 2px solid var(--primary-dark);
+            min-width: 35px;
+            min-height: 35px;
+        }
+
+        .grid-header {
+            grid-column: 1;
+            grid-row: 1;
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        /* Celdas del crucigrama */
         .grid-cell {
             aspect-ratio: 1;
             min-width: 35px;
@@ -334,6 +359,12 @@
         }
 
         .grid-cell.block {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            cursor: default;
+        }
+
+        .grid-cell.empty {
             background: var(--text-primary);
             border-color: var(--text-primary);
             cursor: default;
@@ -369,6 +400,12 @@
             background: var(--gradient-secondary);
             color: var(--text-primary);
             animation: cellIncorrect 0.6s ease;
+        }
+
+        .grid-cell.found {
+            background: var(--gradient-success);
+            color: var(--text-primary);
+            border-color: var(--success);
         }
 
         @keyframes cellCorrect {
@@ -649,7 +686,8 @@
             timer: 0,
             timerInterval: null,
             isPaused: false,
-            gridSize: 15
+            gridSize: 15,
+            wordPositions: {} // Para rastrear la posición de cada palabra
         };
 
         // Elementos del DOM
@@ -775,9 +813,9 @@
                     { word: "MATEMATICAS", definition: "Ciencia que estudia números y formas" }
                 ];
                 
-                if (wordObjects.length >= 5) {
-                    // Seleccionar 5 palabras al azar
-                    const selectedWords = getRandomWords(wordObjects, 5);
+                if (wordObjects.length >= 10) {
+                    // Seleccionar 10 palabras al azar
+                    const selectedWords = getRandomWords(wordObjects, 10);
                     console.log('Palabras seleccionadas:', selectedWords);
                     
                     // Iniciar el juego
@@ -807,12 +845,36 @@
 
         function createEmptyGrid() {
             elements.crucigramaGrid.innerHTML = '';
-            for (let i = 0; i < gameState.gridSize; i++) {
-                for (let j = 0; j < gameState.gridSize; j++) {
+            
+            // Crear encabezado de columnas (A, B, C, D, E, F, G, H, I, J, K, L, M, N, O)
+            for (let col = 0; col < 15; col++) {
+                const headerCell = document.createElement('div');
+                headerCell.className = 'grid-header';
+                headerCell.textContent = String.fromCharCode(65 + col); // A, B, C, D, E, F, G, H, I, J, K, L, M, N, O
+                headerCell.style.gridColumn = col + 2; // +2 porque la primera columna es para numeración de filas
+                headerCell.style.gridRow = 1;
+                elements.crucigramaGrid.appendChild(headerCell);
+            }
+            
+            // Crear numeración de filas (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)
+            for (let row = 0; row < 15; row++) {
+                const sidebarCell = document.createElement('div');
+                sidebarCell.className = 'grid-sidebar';
+                sidebarCell.textContent = row + 1;
+                sidebarCell.style.gridColumn = 1;
+                sidebarCell.style.gridRow = row + 2; // +2 porque la primera fila es para numeración de columnas
+                elements.crucigramaGrid.appendChild(sidebarCell);
+            }
+            
+            // Crear celdas del crucigrama
+            for (let i = 0; i < 15; i++) {
+                for (let j = 0; j < 15; j++) {
                     const cell = document.createElement('div');
                     cell.className = 'grid-cell';
                     cell.dataset.row = i;
                     cell.dataset.col = j;
+                    cell.style.gridColumn = j + 2; // +2 para la numeración
+                    cell.style.gridRow = i + 2; // +2 para la numeración
                     elements.crucigramaGrid.appendChild(cell);
                 }
             }
@@ -831,6 +893,7 @@
             gameState.words = [...words];
             gameState.foundWords = [];
             gameState.timer = 0;
+            gameState.wordPositions = {};
             
             createGameGrid(words);
             startTimer();
@@ -839,7 +902,7 @@
 
         function createGameGrid(words) {
             // Crear matriz vacía
-            gameState.grid = Array(gameState.gridSize).fill().map(() => Array(gameState.gridSize).fill(''));
+            gameState.grid = Array(15).fill().map(() => Array(15).fill(''));
             
             // Colocar palabras en la matriz
             let placedWords = 0;
@@ -849,8 +912,8 @@
                 }
             }
             
-            // Rellenar celdas vacías con letras aleatorias
-            fillEmptyCells();
+            // Marcar celdas vacías como negras
+            markEmptyCells();
             
             // Renderizar la matriz
             renderGrid();
@@ -861,16 +924,22 @@
         }
 
         function placeWordInGrid(word) {
-            const maxAttempts = 100;
+            const maxAttempts = 200; // Aumentar intentos para 10 palabras
             let attempts = 0;
             
             while (attempts < maxAttempts) {
                 const direction = Math.random() < 0.5 ? 'horizontal' : 'vertical';
-                const startRow = Math.floor(Math.random() * gameState.gridSize);
-                const startCol = Math.floor(Math.random() * gameState.gridSize);
+                const startRow = Math.floor(Math.random() * 15);
+                const startCol = Math.floor(Math.random() * 15);
                 
                 if (canPlaceWord(word, startRow, startCol, direction)) {
                     placeWord(word, startRow, startCol, direction);
+                    // Guardar la posición de la palabra
+                    gameState.wordPositions[word] = {
+                        row: startRow,
+                        col: startCol,
+                        direction: direction
+                    };
                     return true;
                 }
                 attempts++;
@@ -880,7 +949,7 @@
 
         function canPlaceWord(word, row, col, direction) {
             if (direction === 'horizontal') {
-                if (col + word.length > gameState.gridSize) return false;
+                if (col + word.length > 15) return false;
                 for (let i = 0; i < word.length; i++) {
                     if (gameState.grid[row][col + i] && 
                         gameState.grid[row][col + i] !== word[i]) {
@@ -888,7 +957,7 @@
                     }
                 }
             } else {
-                if (row + word.length > gameState.gridSize) return false;
+                if (row + word.length > 15) return false;
                 for (let i = 0; i < word.length; i++) {
                     if (gameState.grid[row + i][col] && 
                         gameState.grid[row + i][col] !== word[i]) {
@@ -911,40 +980,37 @@
             }
         }
 
-        function fillEmptyCells() {
-            for (let i = 0; i < gameState.gridSize; i++) {
-                for (let j = 0; j < gameState.gridSize; j++) {
+        function markEmptyCells() {
+            for (let i = 0; i < 15; i++) {
+                for (let j = 0; j < 15; j++) {
                     if (!gameState.grid[i][j]) {
-                        gameState.grid[i][j] = String.fromCharCode(65 + Math.floor(Math.random() * 26));
+                        gameState.grid[i][j] = 'BLACK';
                     }
                 }
             }
         }
 
         function renderGrid() {
-            elements.crucigramaGrid.innerHTML = '';
-            for (let i = 0; i < gameState.gridSize; i++) {
-                for (let j = 0; j < gameState.gridSize; j++) {
-                    const cell = document.createElement('div');
-                    cell.className = 'grid-cell';
-                    cell.dataset.row = i;
-                    cell.dataset.col = j;
-                    
-                    if (gameState.grid[i][j]) {
-                        const input = document.createElement('input');
-                        input.maxLength = 1;
-                        input.dataset.correcta = gameState.grid[i][j];
-                        input.dataset.row = i;
-                        input.dataset.col = j;
-                        input.addEventListener('input', handleInput);
-                        cell.appendChild(input);
-                    } else {
-                        cell.classList.add('block');
-                    }
-                    
-                    elements.crucigramaGrid.appendChild(cell);
+            // Limpiar solo las celdas del crucigrama (no la numeración)
+            const cells = elements.crucigramaGrid.querySelectorAll('.grid-cell');
+            cells.forEach(cell => {
+                const row = parseInt(cell.dataset.row);
+                const col = parseInt(cell.dataset.col);
+                
+                if (gameState.grid[row][col] === 'BLACK') {
+                    cell.classList.add('empty');
+                    cell.innerHTML = '';
+                } else if (gameState.grid[row][col]) {
+                    cell.classList.remove('empty');
+                    const input = document.createElement('input');
+                    input.maxLength = 1;
+                    input.dataset.correcta = gameState.grid[row][col];
+                    input.dataset.row = row;
+                    input.dataset.col = col;
+                    input.addEventListener('input', handleInput);
+                    cell.appendChild(input);
                 }
-            }
+            });
         }
 
         function handleInput(e) {
@@ -957,6 +1023,9 @@
                 if (nextInput) {
                     nextInput.focus();
                 }
+                
+                // Verificar si se completó alguna palabra
+                checkWordCompletion();
             }
         }
 
@@ -973,6 +1042,78 @@
             }
             
             return null;
+        }
+
+        function checkWordCompletion() {
+            // Verificar cada palabra para ver si está completa
+            gameState.words.forEach(wordObj => {
+                if (!gameState.foundWords.includes(wordObj.word)) {
+                    if (isWordComplete(wordObj.word)) {
+                        markWordAsFound(wordObj.word);
+                    }
+                }
+            });
+        }
+
+        function isWordComplete(word) {
+            const position = gameState.wordPositions[word];
+            if (!position) return false;
+            
+            const { row, col, direction } = position;
+            
+            if (direction === 'horizontal') {
+                for (let i = 0; i < word.length; i++) {
+                    const input = elements.crucigramaGrid.querySelector(`input[data-row="${row}"][data-col="${col + i}"]`);
+                    if (!input || input.value.toUpperCase() !== word[i]) {
+                        return false;
+                    }
+                }
+            } else {
+                for (let i = 0; i < word.length; i++) {
+                    const input = elements.crucigramaGrid.querySelector(`input[data-row="${row + i}"][data-col="${col}"]`);
+                    if (!input || input.value.toUpperCase() !== word[i]) {
+                        return false;
+                    }
+                }
+            }
+            
+            return true;
+        }
+
+        function markWordAsFound(word) {
+            if (!gameState.foundWords.includes(word)) {
+                gameState.foundWords.push(word);
+                
+                // Marcar las celdas como encontradas
+                const position = gameState.wordPositions[word];
+                if (position) {
+                    const { row, col, direction } = position;
+                    
+                    if (direction === 'horizontal') {
+                        for (let i = 0; i < word.length; i++) {
+                            const cell = elements.crucigramaGrid.querySelector(`[data-row="${row}"][data-col="${col + i}"]`);
+                            if (cell) {
+                                cell.classList.add('found');
+                            }
+                        }
+                    } else {
+                        for (let i = 0; i < word.length; i++) {
+                            const cell = elements.crucigramaGrid.querySelector(`[data-row="${row + i}"][data-col="${col}"]`);
+                            if (cell) {
+                                cell.classList.add('found');
+                            }
+                        }
+                    }
+                }
+                
+                // Actualizar la lista de palabras
+                displayWords();
+                
+                // Verificar si se completó el juego
+                if (gameState.foundWords.length === gameState.words.length) {
+                    gameWon();
+                }
+            }
         }
 
         function startTimer() {
@@ -1003,8 +1144,24 @@
             elements.wordsList.innerHTML = '';
             gameState.words.forEach(wordObj => {
                 const wordElement = document.createElement('div');
-                wordElement.className = 'word-item';
-                wordElement.textContent = `${wordObj.word} - ${wordObj.definition}`;
+                const isFound = gameState.foundWords.includes(wordObj.word);
+                
+                if (isFound) {
+                    wordElement.className = 'word-item found';
+                } else {
+                    wordElement.className = 'word-item';
+                }
+                
+                // Mostrar solo el nombre y la ubicación
+                const position = gameState.wordPositions[wordObj.word];
+                if (position) {
+                    const colLetter = String.fromCharCode(65 + position.col);
+                    const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
+                    wordElement.textContent = `${wordObj.word} - Fila ${position.row + 1}, Col ${colLetter} (${direction})`;
+                } else {
+                    wordElement.textContent = `${wordObj.word} - Ubicación no definida`;
+                }
+                
                 wordElement.dataset.word = wordObj.word;
                 elements.wordsList.appendChild(wordElement);
             });
@@ -1050,8 +1207,8 @@
             const word = wordObj.word;
             
             // Encontrar una letra de la palabra en la matriz
-            for (let i = 0; i < gameState.gridSize; i++) {
-                for (let j = 0; j < gameState.gridSize; j++) {
+            for (let i = 0; i < 15; i++) {
+                for (let j = 0; j < 15; j++) {
                     if (gameState.grid[i][j] === word[0]) {
                         const cell = elements.crucigramaGrid.querySelector(`[data-row="${i}"][data-col="${j}"]`);
                         if (cell) {
@@ -1092,7 +1249,8 @@
                 timer: 0,
                 timerInterval: null,
                 isPaused: false,
-                gridSize: 15
+                gridSize: 15,
+                wordPositions: {}
             };
             
             elements.timer.textContent = '00:00';
