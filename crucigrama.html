@@ -1152,14 +1152,14 @@
                     wordElement.className = 'word-item';
                 }
                 
-                // Mostrar solo el nombre y la ubicación
+                // Mostrar solo la definición y la ubicación (NO la palabra)
                 const position = gameState.wordPositions[wordObj.word];
                 if (position) {
                     const colLetter = String.fromCharCode(65 + position.col);
                     const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
-                    wordElement.textContent = `${wordObj.word} - Fila ${position.row + 1}, Col ${colLetter} (${direction})`;
+                    wordElement.textContent = `${wordObj.definition} - Fila ${position.row + 1}, Col ${colLetter} (${direction})`;
                 } else {
-                    wordElement.textContent = `${wordObj.word} - Ubicación no definida`;
+                    wordElement.textContent = `${wordObj.definition} - Ubicación no definida`;
                 }
                 
                 wordElement.dataset.word = wordObj.word;
