@@ -280,6 +280,23 @@
             opacity: 0.8;
         }
 
+        .word-item.surrendered {
+            background: var(--gradient-secondary);
+            color: var(--text-primary);
+            border-color: var(--accent);
+            box-shadow: var(--shadow-md);
+        }
+
+        .word-item.surrendered .word-revealed {
+            animation: wordReveal 0.8s ease-in-out;
+        }
+
+        @keyframes wordReveal {
+            0% { transform: scale(0.8); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* Matriz del crucigrama */
         .crucigrama-grid {
             display: grid;
@@ -481,7 +498,7 @@
         .btn-pause { background: var(--gradient-accent); }
         .btn-hint { background: var(--gradient-secondary); }
         .btn-new { background: var(--gradient-primary); }
-        .btn-verify { background: var(--gradient-accent); }
+        .btn-surrender { background: var(--gradient-secondary); }
 
         /* Modales */
         .modal-overlay {
@@ -656,11 +673,11 @@
                     <div class="sidebar-section">
                         <div class="sidebar-title">🎮 Controles</div>
                         <div class="control-buttons">
-                            <button class="control-btn btn-verify" id="verifyBtn">✅ Verificar</button>
                             <button class="control-btn btn-hint" id="hintBtn">💡 Pista</button>
                             <button class="control-btn btn-new" id="newGameBtn">🔄 Nuevo</button>
                             <button class="control-btn btn-pause" id="pauseBtn">⏸️ Pausar</button>
                             <button class="control-btn btn-restart" id="restartBtn">🏁 Reiniciar</button>
+                            <button class="control-btn btn-surrender" id="surrenderBtn">🏳️ Rendirse</button>
                         </div>
                     </div>
                 </div>
@@ -671,7 +688,7 @@
     <!-- Modales -->
     <div class="modal-overlay" id="successModal">
         <div class="modal-content">
-            <h2 class="modal-title">🏆 ¡Felicidades!</h2>
+            <h2 class="modal-title" id="modalTitle">🏆 ¡Felicidades!</h2>
             <p class="modal-text" id="successMessage"></p>
             <button class="modal-btn" onclick="restartGame()">Jugar de nuevo</button>
         </div>
@@ -707,11 +724,11 @@
             crucigramaGrid: document.getElementById('crucigramaGrid'),
             timer: document.getElementById('timer'),
             wordsList: document.getElementById('wordsList'),
-            verifyBtn: document.getElementById('verifyBtn'),
             hintBtn: document.getElementById('hintBtn'),
             newGameBtn: document.getElementById('newGameBtn'),
             pauseBtn: document.getElementById('pauseBtn'),
-            restartBtn: document.getElementById('restartBtn')
+            restartBtn: document.getElementById('restartBtn'),
+            surrenderBtn: document.getElementById('surrenderBtn')
         };
 
         // Inicialización del juego
@@ -882,11 +899,11 @@
 
         function setupEventListeners() {
             // Botones de control
-            elements.verifyBtn.addEventListener('click', verifyGame);
             elements.hintBtn.addEventListener('click', showHint);
             elements.newGameBtn.addEventListener('click', newGame);
             elements.pauseBtn.addEventListener('click', togglePause);
             elements.restartBtn.addEventListener('click', restartGame);
+            elements.surrenderBtn.addEventListener('click', surrenderGame);
 
             // Event listeners para la navegación con las flechas del teclado
             elements.crucigramaGrid.addEventListener('keydown', handleKeyNavigation);
@@ -1267,33 +1284,101 @@
             }
         }
 
-        function verifyGame() {
-            const inputs = elements.crucigramaGrid.querySelectorAll('input');
-            let correctCount = 0;
-            let totalCount = 0;
+        function surrenderGame() {
+            stopTimer();
+            const timeString = elements.timer.textContent;
             
-            inputs.forEach(input => {
-                const value = input.value.toUpperCase();
-                const correct = input.dataset.correcta;
-                const cell = input.closest('.grid-cell');
+            // Mostrar todas las palabras del crucigrama
+            showAllWords();
+            
+            // Cambiar el título del modal para rendición
+            document.getElementById('modalTitle').textContent = '🏳️ ¡Te has rendido!';
+            const message = `Tu tiempo fue ${timeString}. Se han revelado todas las palabras del crucigrama.`;
+            document.getElementById('successMessage').textContent = message;
+            showModal('successModal');
+            
+            // Preparar el juego para el reinicio completo
+            setTimeout(() => {
+                clearAllCellStates();
+            }, 100);
+        }
+
+        function showAllWords() {
+            // Mostrar todas las palabras en el panel izquierdo
+            elements.wordsList.innerHTML = '';
+            gameState.words.forEach(wordObj => {
+                const wordElement = document.createElement('div');
+                wordElement.className = 'word-item surrendered'; // Agregar clase para el estado de rendición
                 
-                if (value === correct) {
-                    cell.classList.add('correct');
-                    cell.classList.remove('incorrect');
-                    correctCount++;
+                // Mostrar definición, número de letras, ubicación y la palabra completa
+                const position = gameState.wordPositions[wordObj.word];
+                if (position) {
+                    const colLetter = String.fromCharCode(65 + position.col);
+                    const direction = position.direction === 'horizontal' ? 'Horizontal' : 'Vertical';
+                    const letterCount = wordObj.word.length;
+                    wordElement.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2px;">
+                            ${letterCount} letra${letterCount !== 1 ? 's' : ''} - Fila ${position.row + 1}, Col ${colLetter} (${direction})
+                        </div>
+                        <div class="word-revealed" style="font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-top: 4px;">
+                            🎯 ${wordObj.word}
+                        </div>
+                    `;
                 } else {
-                    cell.classList.add('incorrect');
-                    cell.classList.remove('correct');
+                    const letterCount = wordObj.word.length;
+                    wordElement.innerHTML = `
+                        <div style="font-weight: 600; margin-bottom: 4px;">${wordObj.definition}</div>
+                        <div style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 2px;">
+                            ${letterCount} letra${letterCount !== 1 ? 's' : ''} - Ubicación no definida
+                        </div>
+                        <div class="word-revealed" style="font-size: 1.1rem; font-weight: 700; color: var(--accent); margin-top: 4px;">
+                            🎯 ${wordObj.word}
+                        </div>
+                    `;
                 }
-                totalCount++;
+                
+                elements.wordsList.appendChild(wordElement);
             });
             
-            // Verificar si se completó el juego
-            if (correctCount === totalCount) {
-                gameWon();
-            } else {
-                showInfo(`Verificación completada. ${correctCount} de ${totalCount} letras correctas.`);
-            }
+            // Rellenar automáticamente todas las celdas del crucigrama con las palabras correctas
+            fillAllCellsWithCorrectWords();
+        }
+
+        function fillAllCellsWithCorrectWords() {
+            // Rellenar todas las celdas con las palabras correctas
+            gameState.words.forEach(wordObj => {
+                const position = gameState.wordPositions[wordObj.word];
+                if (position) {
+                    const { row, col, direction } = position;
+                    
+                    if (direction === 'horizontal') {
+                        for (let i = 0; i < wordObj.word.length; i++) {
+                            const cell = elements.crucigramaGrid.querySelector(`[data-row="${row}"][data-col="${col + i}"]`);
+                            if (cell) {
+                                const input = cell.querySelector('input');
+                                if (input) {
+                                    input.value = wordObj.word[i];
+                                    input.readOnly = true;
+                                    cell.classList.add('found');
+                                }
+                            }
+                        }
+                    } else {
+                        for (let i = 0; i < wordObj.word.length; i++) {
+                            const cell = elements.crucigramaGrid.querySelector(`[data-row="${row + i}"][data-col="${col}"]`);
+                            if (cell) {
+                                const input = cell.querySelector('input');
+                                if (input) {
+                                    input.value = wordObj.word[i];
+                                    input.readOnly = true;
+                                    cell.classList.add('found');
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function showHint() {
@@ -1363,13 +1448,13 @@
             const timeString = elements.timer.textContent;
             const message = `¡Has completado el crucigrama en ${timeString}!`;
             
+            // Restaurar el título original del modal
+            document.getElementById('modalTitle').textContent = '🏆 ¡Felicidades!';
             document.getElementById('successMessage').textContent = message;
             showModal('successModal');
             
             // Preparar el juego para el reinicio completo
-            // Esto asegura que cuando se reinicie, esté completamente limpio
             setTimeout(() => {
-                // Limpiar cualquier estado residual
                 clearAllCellStates();
             }, 100);
         }
