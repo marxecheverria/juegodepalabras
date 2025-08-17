@@ -1000,6 +1000,12 @@
             // Limpiar solo las celdas del crucigrama (no la numeración)
             const cells = elements.crucigramaGrid.querySelectorAll('.grid-cell');
             cells.forEach(cell => {
+                // Limpiar todas las clases CSS y estilos
+                cell.classList.remove('empty', 'found', 'correct', 'incorrect');
+                cell.style.boxShadow = '';
+                cell.style.backgroundColor = '';
+                cell.style.borderColor = '';
+                
                 const row = parseInt(cell.dataset.row);
                 const col = parseInt(cell.dataset.col);
                 
@@ -1294,34 +1300,8 @@
         }
 
         function newGame() {
-            // Detener el temporizador
-            if (gameState.timerInterval) {
-                clearInterval(gameState.timerInterval);
-            }
-            
             // Reiniciar completamente el estado del juego
-            gameState = {
-                words: [],
-                foundWords: [],
-                grid: [],
-                timer: 0,
-                timerInterval: null,
-                isPaused: false,
-                gridSize: 15,
-                wordPositions: {}
-            };
-            
-            // Limpiar el temporizador
-            elements.timer.textContent = '00:00';
-            
-            // Limpiar la lista de palabras
-            elements.wordsList.innerHTML = '';
-            
-            // Limpiar completamente la matriz del crucigrama
-            elements.crucigramaGrid.innerHTML = '';
-            
-            // Crear una nueva matriz vacía
-            createEmptyGrid();
+            resetGameState();
             
             // Cargar nuevas palabras y iniciar nuevo juego
             loadWordsFromFile();
@@ -1330,34 +1310,8 @@
         function restartGame() {
             closeModal('successModal');
             
-            // Detener el temporizador
-            if (gameState.timerInterval) {
-                clearInterval(gameState.timerInterval);
-            }
-            
             // Reiniciar completamente el estado del juego
-            gameState = {
-                words: [],
-                foundWords: [],
-                grid: [],
-                timer: 0,
-                timerInterval: null,
-                isPaused: false,
-                gridSize: 15,
-                wordPositions: {}
-            };
-            
-            // Limpiar el temporizador
-            elements.timer.textContent = '00:00';
-            
-            // Limpiar la lista de palabras
-            elements.wordsList.innerHTML = '';
-            
-            // Limpiar completamente la matriz del crucigrama
-            elements.crucigramaGrid.innerHTML = '';
-            
-            // Crear una nueva matriz vacía
-            createEmptyGrid();
+            resetGameState();
             
             // Cargar nuevas palabras y iniciar nuevo juego
             loadWordsFromFile();
@@ -1370,6 +1324,13 @@
             
             document.getElementById('successMessage').textContent = message;
             showModal('successModal');
+            
+            // Preparar el juego para el reinicio completo
+            // Esto asegura que cuando se reinicie, esté completamente limpio
+            setTimeout(() => {
+                // Limpiar cualquier estado residual
+                clearAllCellStates();
+            }, 100);
         }
 
         function showModal(modalId) {
@@ -1383,6 +1344,63 @@
         function showInfo(message) {
             document.getElementById('infoMessage').textContent = message;
             showModal('infoModal');
+        }
+
+        function cleanGrid() {
+            // Primero limpiar todos los estados de las celdas existentes
+            clearAllCellStates();
+            
+            // Luego limpiar completamente la matriz del crucigrama
+            elements.crucigramaGrid.innerHTML = '';
+            
+            // Crear una nueva matriz completamente limpia
+            createEmptyGrid();
+        }
+
+        function clearAllCellStates() {
+            // Eliminar todas las clases CSS de las celdas existentes
+            const cells = elements.crucigramaGrid.querySelectorAll('.grid-cell');
+            cells.forEach(cell => {
+                cell.classList.remove('found', 'correct', 'incorrect', 'empty', 'block');
+                cell.style.boxShadow = '';
+                cell.style.backgroundColor = '';
+                cell.style.borderColor = '';
+                
+                // Limpiar cualquier input dentro de la celda
+                const input = cell.querySelector('input');
+                if (input) {
+                    input.value = '';
+                    input.remove();
+                }
+            });
+        }
+
+        function resetGameState() {
+            // Detener el temporizador
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            // Reiniciar completamente el estado del juego
+            gameState = {
+                words: [],
+                foundWords: [],
+                grid: [],
+                timer: 0,
+                timerInterval: null,
+                isPaused: false,
+                gridSize: 15,
+                wordPositions: {}
+            };
+            
+            // Limpiar el temporizador
+            elements.timer.textContent = '00:00';
+            
+            // Limpiar la lista de palabras
+            elements.wordsList.innerHTML = '';
+            
+            // Limpiar completamente la matriz del crucigrama
+            cleanGrid();
         }
 
         // Cerrar modales con Escape
