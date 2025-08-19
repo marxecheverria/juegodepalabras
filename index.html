@@ -511,7 +511,7 @@
                     <li>Palabras aleatorias cada partida</li>
                     <li>11 categorías temáticas</li>
                 </ul>
-                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Crucigrama Elite">🎯 Jugar Ahora</div>
+                <div class="game-button" role="button" aria-label="Jugar al Crucigrama Elite">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Juego de Letras -->
@@ -529,7 +529,7 @@
                     <li>Múltiples niveles de dificultad</li>
                     <li>Modo multijugador local</li>
                 </ul>
-                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Juego de Letras">🎯 Jugar Ahora</div>
+                <div class="game-button" role="button" aria-label="Jugar al Juego de Letras">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Juego de Cartas -->
@@ -547,7 +547,7 @@
                     <li>Puntuación progresiva</li>
                     <li>Interfaz intuitiva</li>
                 </ul>
-                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Juego de Cartas">🎯 Jugar Ahora</div>
+                <div class="game-button" role="button" aria-label="Jugar al Juego de Cartas">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Ahorcado -->
@@ -565,7 +565,7 @@
                     <li>Sistema de pistas y ayudas</li>
                     <li>Puntuación basada en intentos restantes</li>
                 </ul>
-                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Ahorcado">🎯 Jugar Ahora</div>
+                <div class="game-button" role="button" aria-label="Jugar al Ahorcado">🎯 Jugar Ahora</div>
             </a>
         </main>
 
@@ -631,18 +631,7 @@
             const gameButtons = document.querySelectorAll('.game-button');
             
             gameButtons.forEach(button => {
-                // Navegación por teclado (Enter y Espacio)
-                button.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        const gameCard = button.closest('.game-card');
-                        if (gameCard) {
-                            gameCard.click();
-                        }
-                    }
-                });
-
-                // Indicador visual de foco
+                // Indicador visual de foco (el enlace padre maneja la navegación)
                 button.addEventListener('focus', () => {
                     button.style.transform = 'translateY(-2px) scale(1.02)';
                 });
