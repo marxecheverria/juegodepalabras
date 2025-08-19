@@ -39,13 +39,16 @@ if (-not $FtpServer -or -not $Username -or -not $Password) {
 # Archivos principales a subir
 $FilesToUpload = @(
     "index.html",                    # Menú principal interactivo
+    "ahorcado.html",                # Juego del ahorcado Pro
     "crucigrama.html",              # Juego de crucigrama
     "letras.html",                  # Juego de letras
     "cartas.html",                  # Juego de cartas
     "words.json",                   # Base de datos de palabras
     "config.json",                  # Configuración del juego
+    "palabras.txt",                 # Archivo de palabras adicionales
     "README.md",                    # Documentación del proyecto
     "INSTRUCCIONES.md",             # Instrucciones generales
+    "INSTRUCCIONES_DESPLIEGUE.md",  # Instrucciones de despliegue
     "INSTRUCCIONES_OPTIMIZACION.md" # Documentación técnica
 )
 
