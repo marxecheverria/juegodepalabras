@@ -766,40 +766,72 @@
         // Cargar palabras desde words.json
         async function loadWordsFromJSON() {
             try {
+                // Cargar palabras desde el archivo JSON externo
                 const response = await fetch('words.json');
                 if (!response.ok) {
-                    throw new Error('No se pudo cargar words.json');
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                const allWords = [];
                 
                 // Extraer todas las palabras de todas las categorías
-                Object.values(data.categories).forEach(category => {
-                    category.forEach(item => {
-                        if (item.word && item.word.length >= 4 && item.word.length <= 12) {
-                            allWords.push({
-                                word: item.word,
-                                definition: item.definition
-                            });
-                        }
-                    });
-                });
+                let allWords = [];
+                for (const category in data.categories) {
+                    allWords = allWords.concat(data.categories[category]);
+                }
                 
                 if (allWords.length >= 10) {
+                    // Agregar un poco de aleatoriedad adicional mezclando las categorías
+                    const categoryKeys = Object.keys(data.categories);
+                    for (let i = categoryKeys.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [categoryKeys[i], categoryKeys[j]] = [categoryKeys[j], categoryKeys[i]];
+                    }
+                    
+                    // Reconstruir el array mezclando las categorías
+                    allWords = [];
+                    for (const category of categoryKeys) {
+                        allWords = allWords.concat(data.categories[category]);
+                    }
+                    
                     // Seleccionar 10 palabras al azar
                     gameState.words = getRandomWords(allWords, 10);
-                    console.log('Palabras cargadas:', gameState.words);
+                    
+                    // Log para debugging - mostrar las palabras seleccionadas
+                    console.log('Total de palabras disponibles:', allWords.length);
+                    console.log('Categorías disponibles:', categoryKeys);
+                    console.log('Palabras seleccionadas para esta partida:');
+                    gameState.words.forEach((wordObj, index) => {
+                        console.log(`${index + 1}. ${wordObj.word} - ${wordObj.definition}`);
+                    });
                     
                     // Mostrar la primera palabra
                     showCurrentWord();
                     updateWordsList();
                 } else {
-                    showError('No hay suficientes palabras válidas en words.json');
+                    showError('No hay suficientes palabras disponibles en el archivo JSON.');
                 }
             } catch (error) {
-                console.error('Error al cargar words.json:', error);
-                showError('Error al cargar words.json. Asegúrate de que el archivo esté en la misma carpeta.');
+                console.error('Error al cargar palabras desde JSON:', error);
+                
+                // Fallback: usar palabras predefinidas si falla la carga del JSON
+                console.log('Usando palabras predefinidas como fallback...');
+                const fallbackWords = [
+                    { word: "PLATANO", definition: "Fruta amarilla tropical" },
+                    { word: "MARTE", definition: "Planeta rojo del sistema solar" },
+                    { word: "PARIS", definition: "Capital de Francia" },
+                    { word: "ORO", definition: "Metal precioso de color amarillo" },
+                    { word: "PERRO", definition: "Animal doméstico que ladra" },
+                    { word: "MANZANA", definition: "Fruta roja, verde o amarilla" },
+                    { word: "ELEFANTE", definition: "Mamífero terrestre de gran tamaño con trompa" },
+                    { word: "BALON", definition: "Objeto esférico usado en deportes" },
+                    { word: "LIBRO", definition: "Conjunto de hojas impresas encuadernadas" },
+                    { word: "SOL", definition: "Estrella que ilumina la Tierra" }
+                ];
+                
+                gameState.words = fallbackWords;
+                showCurrentWord();
+                updateWordsList();
             }
         }
 
@@ -946,7 +978,7 @@
             if (confirm('¿Estás seguro de que quieres rendirte? Se revelará la respuesta.')) {
                 showInfo(`La respuesta era: "${gameState.currentWord}"`, 'info');
                 elements.anagramWord.textContent = gameState.currentWord;
-                elements.anagramWord.style.color = var(--success);
+                elements.anagramWord.style.color = getComputedStyle(document.documentElement).getPropertyValue('--success');
             }
         }
 
@@ -1051,7 +1083,7 @@
         function showError(message) {
             elements.anagramWord.textContent = 'ERROR';
             elements.anagramHint.textContent = message;
-            elements.anagramWord.style.color = var(--error);
+            elements.anagramWord.style.color = getComputedStyle(document.documentElement).getPropertyValue('--error');
         }
 
         // Mostrar modal
