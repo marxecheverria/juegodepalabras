@@ -298,6 +298,17 @@
             box-shadow: var(--shadow-md);
         }
 
+        /* Estilos adicionales para accesibilidad */
+        .game-button:focus {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
+        .game-button:focus-visible {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
+        }
+
         .game-card.crucigrama .game-button {
             background: var(--gradient-accent);
             color: var(--bg-card);
@@ -500,7 +511,7 @@
                     <li>Palabras aleatorias cada partida</li>
                     <li>11 categorías temáticas</li>
                 </ul>
-                <button class="game-button">🎯 Jugar Ahora</button>
+                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Crucigrama Elite">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Juego de Letras -->
@@ -518,7 +529,7 @@
                     <li>Múltiples niveles de dificultad</li>
                     <li>Modo multijugador local</li>
                 </ul>
-                <button class="game-button">🎯 Jugar Ahora</button>
+                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Juego de Letras">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Juego de Cartas -->
@@ -536,7 +547,7 @@
                     <li>Puntuación progresiva</li>
                     <li>Interfaz intuitiva</li>
                 </ul>
-                <button class="game-button">🎯 Jugar Ahora</button>
+                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Juego de Cartas">🎯 Jugar Ahora</div>
             </a>
 
             <!-- Ahorcado -->
@@ -554,7 +565,7 @@
                     <li>Sistema de pistas y ayudas</li>
                     <li>Puntuación basada en intentos restantes</li>
                 </ul>
-                <button class="game-button">🎯 Jugar Ahora</button>
+                <div class="game-button" role="button" tabindex="0" aria-label="Jugar al Ahorcado">🎯 Jugar Ahora</div>
             </a>
         </main>
 
@@ -613,6 +624,31 @@
                 
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Funcionalidad de teclado para los botones de juego
+            const gameButtons = document.querySelectorAll('.game-button');
+            
+            gameButtons.forEach(button => {
+                // Navegación por teclado (Enter y Espacio)
+                button.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        const gameCard = button.closest('.game-card');
+                        if (gameCard) {
+                            gameCard.click();
+                        }
+                    }
+                });
+
+                // Indicador visual de foco
+                button.addEventListener('focus', () => {
+                    button.style.transform = 'translateY(-2px) scale(1.02)';
+                });
+
+                button.addEventListener('blur', () => {
+                    button.style.transform = 'translateY(0) scale(1)';
                 });
             });
 
