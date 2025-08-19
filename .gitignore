@@ -12,31 +12,38 @@ desktop.ini
 .env
 .env.local
 .env.production
-deploy-config.ps1
-deploy-config-ejemplo.ps1
 
-# Archivos de IDE
+# Archivos de IDE/Editor
 .vscode/
 .idea/
 *.swp
 *.swo
+*~
 
 # Archivos de respaldo
 *.bak
 *.backup
-*~
+*.old
 
-# Archivos de compilación
+# Archivos de construcción
 dist/
 build/
+out/
+
+# Dependencias (si las agregas en el futuro)
 node_modules/
-
-# Directorios de respaldo
-backups/
-*.backup
-
-# Archivos de registro
-*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+# Archivos de caché
+.cache/
+.parcel-cache/
+
+# Archivos de prueba
+coverage/
+.nyc_output/
+
+# Archivos de despliegue
+deploy/
+.ftpconfig
