@@ -46,6 +46,7 @@ $FilesToUpload = @(
     "words.json",                   # Base de datos de palabras
     "config.json",                  # Configuración del juego
     "palabras.txt",                 # Archivo de palabras adicionales
+    ".htaccess",                    # Configuración de seguridad y HTTPS
     "README.md",                    # Documentación del proyecto
     "INSTRUCCIONES.md",             # Instrucciones generales
     "INSTRUCCIONES_DESPLIEGUE.md",  # Instrucciones de despliegue

@@ -37,6 +37,13 @@
     <meta name="rating" content="General">
     <meta name="theme-color" content="#8B9DC3">
     
+    <!-- Metaetiquetas de seguridad y HTTPS -->
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
+    
     <!-- Favicon esencial - solo para LCP crítico -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
     
@@ -531,6 +538,28 @@
             transform: translateY(-2px);
         }
 
+        /* Indicador de seguridad HTTPS */
+        .security-info {
+            text-align: center;
+            margin-top: var(--space-md);
+            padding: var(--space-sm);
+            background: var(--gradient-success);
+            border-radius: var(--radius-md);
+            color: var(--bg-card);
+        }
+
+        .security-badge {
+            display: block;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: var(--space-xs);
+        }
+
+        .security-text {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .main-title {
@@ -721,6 +750,10 @@
                     🔧 Documentación Técnica
                 </a>
             </div>
+            <div class="security-info">
+                <span class="security-badge">🔒 HTTPS Seguro</span>
+                <span class="security-text">Tu conexión está protegida</span>
+            </div>
         </footer>
     </div>
 
@@ -772,6 +805,11 @@
     </script>
 
     <script>
+        // Redirección automática a HTTPS
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            location.replace(`https:${location.href.substring(location.protocol.length)}`);
+        }
+        
         // Optimización de rendimiento: cargar JavaScript de forma no bloqueante
         if ('requestIdleCallback' in window) {
             // Usar requestIdleCallback para tareas no críticas
