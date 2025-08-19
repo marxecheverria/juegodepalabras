@@ -35,6 +35,8 @@
             --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
             --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
             --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
+            --gradient-error: linear-gradient(135deg, #C4A484 0%, #D4B494 100%);
+            --gradient-ahorcado: linear-gradient(135deg, #6B7A9A 0%, #8B9DC3 100%);
             
             /* Sombras modernas y suaves */
             --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
@@ -298,18 +300,30 @@
 
         .game-card.crucigrama .game-button {
             background: var(--gradient-accent);
+            color: var(--bg-card);
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.letras .game-button {
             background: var(--gradient-success);
+            color: var(--bg-card);
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.cartas .game-button {
             background: var(--gradient-secondary);
+            color: var(--bg-card);
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.ahorcado .game-button {
-            background: var(--gradient-error);
+            background: var(--gradient-ahorcado);
+            color: var(--bg-card);
+            font-weight: 700;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         /* Sección de estadísticas */
