@@ -225,6 +225,14 @@
             background: var(--gradient-secondary);
         }
 
+        .game-card.ahorcado:hover {
+            border-color: var(--error);
+        }
+
+        .game-card.ahorcado::before {
+            background: var(--gradient-error);
+        }
+
         .game-icon {
             font-size: 4rem;
             margin-bottom: var(--space-md);
@@ -298,6 +306,10 @@
 
         .game-card.cartas .game-button {
             background: var(--gradient-secondary);
+        }
+
+        .game-card.ahorcado .game-button {
+            background: var(--gradient-error);
         }
 
         /* Sección de estadísticas */
@@ -415,6 +427,7 @@
         .game-card:nth-child(1) { animation-delay: 0.1s; }
         .game-card:nth-child(2) { animation-delay: 0.2s; }
         .game-card:nth-child(3) { animation-delay: 0.3s; }
+        .game-card:nth-child(4) { animation-delay: 0.4s; }
 
         @keyframes fadeInUp {
             to {
@@ -511,6 +524,24 @@
                 </ul>
                 <button class="game-button">🎯 Jugar Ahora</button>
             </a>
+
+            <!-- Ahorcado -->
+            <a href="ahorcado.html" class="game-card ahorcado">
+                <div class="game-icon">🎯</div>
+                <h2 class="game-title">Ahorcado</h2>
+                <p class="game-description">
+                    ¡Salva al personaje adivinando la palabra letra por letra! 
+                    Usa tu vocabulario y lógica para descubrir la palabra oculta antes de que se complete el ahorcado.
+                </p>
+                <ul class="game-features">
+                    <li>Palabras aleatorias de múltiples categorías</li>
+                    <li>Dibujo del ahorcado que se va completando</li>
+                    <li>Teclado virtual interactivo</li>
+                    <li>Sistema de pistas y ayudas</li>
+                    <li>Puntuación basada en intentos restantes</li>
+                </ul>
+                <button class="game-button">🎯 Jugar Ahora</button>
+            </a>
         </main>
 
         <!-- Sección de estadísticas -->
@@ -518,7 +549,7 @@
             <h2 class="stats-title">📊 Estadísticas del Proyecto</h2>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <div class="stat-number">3</div>
+                    <div class="stat-number">4</div>
                     <div class="stat-label">Juegos Disponibles</div>
                 </div>
                 <div class="stat-item">
