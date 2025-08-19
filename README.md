@@ -63,6 +63,30 @@
 
 ---
 
+### 🎯 **Juego de Anagramas** (`anagramas.html`)
+**Desafío intelectual de reorganización de letras**
+
+#### ✨ Características Principales:
+- **Palabras desordenadas** de múltiples categorías temáticas
+- **Sistema de pistas inteligente** que se adapta a la dificultad
+- **Puntuación dinámica** basada en longitud de palabra y uso de pistas
+- **Temporizador integrado** para seguimiento del progreso
+- **Estadísticas detalladas** de rendimiento y precisión
+
+#### 🎯 Objetivos Educativos:
+- **Desarrollo de pensamiento lógico** y analítico
+- **Mejora del vocabulario** y comprensión de palabras
+- **Estimulación de la memoria** y concentración
+- **Ejercitación de habilidades** de resolución de problemas
+
+#### 🧠 Beneficios Cognitivos:
+- **Agilidad mental** y velocidad de procesamiento
+- **Capacidad de análisis** y síntesis
+- **Memoria de trabajo** y retención de información
+- **Pensamiento creativo** y flexible
+
+---
+
 ### 🃏 **Juego de Cartas** (`cartas.html`)
 **Memoria y asociación de conceptos**
 

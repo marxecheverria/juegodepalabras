@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WordQuest Elite - Juego de Anagramas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Paleta de colores modernos y suaves */
+            --primary: #8B9DC3;
+            --primary-dark: #6B7A9A;
+            --secondary: #D4A5A5;
+            --accent: #E6B17A;
+            --success: #9CAF88;
+            --warning: #D4A574;
+            --error: #C4A484;
+            
+            /* Colores de fondo modernos */
+            --bg-primary: #F8FAFC;
+            --bg-secondary: #F1F5F9;
+            --bg-tertiary: #E2E8F0;
+            --bg-card: #FFFFFF;
+            --bg-glass: rgba(139, 157, 195, 0.1);
+            
+            /* Colores de texto modernos */
+            --text-primary: #1E293B;
+            --text-secondary: #475569;
+            --text-muted: #64748B;
+            
+            /* Gradientes modernos y suaves */
+            --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
+            --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
+            --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
+            
+            /* Sombras modernas y suaves */
+            --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
+            --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
+            --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
+            --shadow-glow: 0 0 20px rgba(139, 157, 195, 0.3);
+            
+            /* Espaciado */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+            
+            /* Bordes */
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --radius-xl: 32px;
+            
+            /* Transiciones */
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Fondo animado moderno con partículas suaves */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 157, 195, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 165, 165, 0.06) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(230, 177, 122, 0.04) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(1deg); }
+        }
+
+        /* Contenedor principal */
+        .game-container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: var(--space-lg);
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: var(--space-xl);
+            min-height: 100vh;
+            align-items: start;
+        }
+
+        /* Panel principal del juego */
+        .game-panel {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--bg-glass);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        /* Título del juego */
+        .game-title {
+            text-align: center;
+            margin-bottom: var(--space-xl);
+            color: var(--primary);
+        }
+
+        .game-title h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: var(--space-sm);
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-title p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        /* Área de anagrama */
+        .anagram-area {
+            text-align: center;
+            padding: var(--space-xl);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-lg);
+            border: 2px solid var(--primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .anagram-area::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(139, 157, 195, 0.1), transparent);
+            animation: anagramShine 3s ease-in-out infinite;
+        }
+
+        @keyframes anagramShine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .anagram-label {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-md);
+            font-weight: 600;
+        }
+
+        .anagram-word {
+            font-size: 4rem;
+            font-weight: 800;
+            color: var(--primary);
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 0.5rem;
+            margin-bottom: var(--space-lg);
+            text-shadow: var(--shadow-glow);
+            animation: anagramPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes anagramPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .anagram-hint {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: var(--space-md);
+        }
+
+        /* Área de entrada */
+        .input-area {
+            text-align: center;
+            margin-bottom: var(--space-lg);
+        }
+
+        .answer-input {
+            width: 100%;
+            max-width: 400px;
+            padding: var(--space-md);
+            font-size: 1.5rem;
+            border: 3px solid var(--bg-glass);
+            border-radius: var(--radius-lg);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            text-align: center;
+            font-family: 'Space Grotesk', monospace;
+            transition: var(--transition);
+            margin-bottom: var(--space-md);
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--shadow-glow);
+            transform: scale(1.02);
+        }
+
+        .answer-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Botones */
+        .button-group {
+            display: flex;
+            gap: var(--space-md);
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: var(--space-lg);
+        }
+
+        .game-btn {
+            padding: var(--space-md) var(--space-lg);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .game-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .game-btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-secondary {
+            background: var(--gradient-secondary);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-accent {
+            background: var(--gradient-accent);
+            color: var(--bg-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-accent:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .btn-success {
+            background: var(--gradient-success);
+            color: var(--text-primary);
+            box-shadow: var(--shadow-md);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Barra lateral */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+            position: sticky;
+            top: var(--space-lg);
+        }
+
+        .sidebar-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: var(--space-lg);
+            border: 2px solid var(--bg-glass);
+            box-shadow: var(--shadow-md);
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+            display: flex;
+            align-items: center;
+            gap: var(--space-xs);
+            text-align: center;
+        }
+
+        /* Temporizador */
+        .timer-display {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: 'Space Grotesk', monospace;
+            letter-spacing: 3px;
+            margin-bottom: var(--space-md);
+            text-shadow: var(--shadow-glow);
+        }
+
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-md);
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: var(--space-sm);
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Lista de palabras */
+        .words-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: var(--space-sm);
+        }
+
+        .word-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-sm);
+            margin-bottom: var(--space-xs);
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+
+        .word-item:hover {
+            background: var(--primary);
+            color: var(--bg-primary);
+            transform: translateX(5px);
+        }
+
+        .word-text {
+            font-weight: 600;
+            font-family: 'Space Grotesk', monospace;
+        }
+
+        .word-status {
+            font-size: 1.2rem;
+        }
+
+        .word-status.found {
+            color: var(--success);
+        }
+
+        .word-status.pending {
+            color: var(--accent);
+        }
+
+        /* Mensajes de información */
+        .info-message {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-md);
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-message.success {
+            background: rgba(156, 175, 136, 0.1);
+            border-left-color: var(--success);
+            color: var(--success);
+        }
+
+        .info-message.error {
+            background: rgba(196, 164, 132, 0.1);
+            border-left-color: var(--error);
+            color: var(--error);
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--bg-glass);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-md);
+        }
+
+        .modal-message {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: var(--space-lg);
+            line-height: 1.6;
+        }
+
+        .modal-btn {
+            padding: var(--space-md) var(--space-lg);
+            font-size: 1.1rem;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+            margin: 0 var(--space-xs);
+        }
+
+        .modal-btn.primary {
+            background: var(--gradient-primary);
+            color: var(--bg-primary);
+        }
+
+        .modal-btn.secondary {
+            background: var(--gradient-secondary);
+            color: var(--text-primary);
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .game-container {
+                grid-template-columns: 1fr;
+                gap: var(--space-lg);
+            }
+            
+            .sidebar {
+                position: static;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: var(--space-md);
+            }
+            
+            .game-title h1 {
+                font-size: 2rem;
+            }
+            
+            .anagram-word {
+                font-size: 2.5rem;
+                letter-spacing: 0.3rem;
+            }
+            
+            .button-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .game-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+        }
+
+        /* Scrollbar personalizado */
+        .words-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .words-list::-webkit-scrollbar-track {
+            background: var(--bg-glass);
+            border-radius: var(--radius-sm);
+        }
+
+        .words-list::-webkit-scrollbar-thumb {
+            background: var(--primary);
+            border-radius: var(--radius-sm);
+        }
+
+        .words-list::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <!-- Panel principal del juego -->
+        <div class="game-panel">
+            <div class="game-title">
+                <h1>🎯 Anagramas</h1>
+                <p>Descubre la palabra original reorganizando las letras</p>
+            </div>
+
+            <!-- Área del anagrama -->
+            <div class="anagram-area">
+                <div class="anagram-label">Palabra Desordenada:</div>
+                <div class="anagram-word" id="anagramWord">CARGANDO...</div>
+                <div class="anagram-hint" id="anagramHint">Preparando juego...</div>
+            </div>
+
+            <!-- Área de entrada de respuesta -->
+            <div class="input-area">
+                <input type="text" 
+                       class="answer-input" 
+                       id="answerInput" 
+                       placeholder="Escribe tu respuesta aquí..."
+                       maxlength="20"
+                       autocomplete="off">
+                <div class="button-group">
+                    <button class="game-btn btn-primary" id="submitBtn">✅ Verificar</button>
+                    <button class="game-btn btn-secondary" id="hintBtn">💡 Pista</button>
+                    <button class="game-btn btn-accent" id="newWordBtn">🔄 Nueva Palabra</button>
+                </div>
+            </div>
+
+            <!-- Mensaje de información -->
+            <div class="info-message" id="infoMessage" style="display: none;">
+                Mensaje de información
+            </div>
+        </div>
+
+        <!-- Barra lateral -->
+        <div class="sidebar">
+            <!-- Temporizador -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">⏱️ Tiempo</div>
+                <div class="timer-display" id="timer">00:00</div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">📊 Estadísticas</div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="scoreValue">0</div>
+                        <div class="stat-label">Puntos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="wordsSolvedValue">0</div>
+                        <div class="stat-label">Resueltas</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="hintsUsedValue">0</div>
+                        <div class="stat-label">Pistas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="accuracyValue">100%</div>
+                        <div class="stat-label">Precisión</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de palabras -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">📝 Palabras del Juego</div>
+                <div class="words-list" id="wordsList">
+                    <div class="word-item">
+                        <span class="word-text">Cargando...</span>
+                        <span class="word-status pending">⏳</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controles del juego -->
+            <div class="sidebar-section">
+                <div class="sidebar-title">🎮 Controles</div>
+                <div class="button-group" style="flex-direction: column;">
+                    <button class="game-btn btn-success" id="newGameBtn">🆕 Nuevo Juego</button>
+                    <button class="game-btn btn-secondary" id="giveUpBtn">🏳️ Rendirse</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <div class="modal-title">🎉 ¡Correcto!</div>
+            <div class="modal-message" id="successMessage">¡Has resuelto el anagrama!</div>
+            <div class="button-group">
+                <button class="modal-btn primary" onclick="nextWord()">Siguiente Palabra</button>
+                <button class="modal-btn secondary" onclick="closeModal('successModal')">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de información -->
+    <div class="modal-overlay" id="infoModal">
+        <div class="modal-content">
+            <div class="modal-title">ℹ️ Información</div>
+            <div class="modal-message" id="infoMessage">Mensaje de información</div>
+            <div class="button-group">
+                <button class="modal-btn primary" onclick="closeModal('infoModal')">Entendido</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado del juego
+        const gameState = {
+            currentWord: '',
+            currentAnagram: '',
+            currentHint: '',
+            words: [],
+            solvedWords: [],
+            score: 0,
+            hintsUsed: 0,
+            totalAttempts: 0,
+            correctAttempts: 0,
+            timer: 0,
+            timerInterval: null,
+            currentWordIndex: 0
+        };
+
+        // Elementos del DOM
+        const elements = {
+            anagramWord: document.getElementById('anagramWord'),
+            anagramHint: document.getElementById('anagramHint'),
+            answerInput: document.getElementById('answerInput'),
+            submitBtn: document.getElementById('submitBtn'),
+            hintBtn: document.getElementById('hintBtn'),
+            newWordBtn: document.getElementById('newWordBtn'),
+            newGameBtn: document.getElementById('newGameBtn'),
+            giveUpBtn: document.getElementById('giveUpBtn'),
+            timer: document.getElementById('timer'),
+            scoreValue: document.getElementById('scoreValue'),
+            wordsSolvedValue: document.getElementById('wordsSolvedValue'),
+            hintsUsedValue: document.getElementById('hintsUsedValue'),
+            accuracyValue: document.getElementById('accuracyValue'),
+            wordsList: document.getElementById('wordsList'),
+            infoMessage: document.getElementById('infoMessage')
+        };
+
+        // Inicializar el juego
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeGame();
+            setupEventListeners();
+            loadWordsFromJSON();
+        });
+
+        // Configurar event listeners
+        function setupEventListeners() {
+            elements.submitBtn.addEventListener('click', checkAnswer);
+            elements.hintBtn.addEventListener('click', showHint);
+            elements.newWordBtn.addEventListener('click', nextWord);
+            elements.newGameBtn.addEventListener('click', newGame);
+            elements.giveUpBtn.addEventListener('click', giveUp);
+            
+            // Enter para enviar respuesta
+            elements.answerInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    checkAnswer();
+                }
+            });
+
+            // Focus en el input al cargar
+            elements.answerInput.focus();
+        }
+
+        // Inicializar el juego
+        function initializeGame() {
+            gameState.score = 0;
+            gameState.hintsUsed = 0;
+            gameState.totalAttempts = 0;
+            gameState.correctAttempts = 0;
+            gameState.solvedWords = [];
+            gameState.currentWordIndex = 0;
+            
+            updateStats();
+            startTimer();
+        }
+
+        // Cargar palabras desde words.json
+        async function loadWordsFromJSON() {
+            try {
+                const response = await fetch('words.json');
+                if (!response.ok) {
+                    throw new Error('No se pudo cargar words.json');
+                }
+                
+                const data = await response.json();
+                const allWords = [];
+                
+                // Extraer todas las palabras de todas las categorías
+                Object.values(data.categories).forEach(category => {
+                    category.forEach(item => {
+                        if (item.word && item.word.length >= 4 && item.word.length <= 12) {
+                            allWords.push({
+                                word: item.word,
+                                definition: item.definition
+                            });
+                        }
+                    });
+                });
+                
+                if (allWords.length >= 10) {
+                    // Seleccionar 10 palabras al azar
+                    gameState.words = getRandomWords(allWords, 10);
+                    console.log('Palabras cargadas:', gameState.words);
+                    
+                    // Mostrar la primera palabra
+                    showCurrentWord();
+                    updateWordsList();
+                } else {
+                    showError('No hay suficientes palabras válidas en words.json');
+                }
+            } catch (error) {
+                console.error('Error al cargar words.json:', error);
+                showError('Error al cargar words.json. Asegúrate de que el archivo esté en la misma carpeta.');
+            }
+        }
+
+        // Obtener palabras aleatorias
+        function getRandomWords(words, count) {
+            const shuffled = [...words].sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, count);
+        }
+
+        // Mostrar palabra actual
+        function showCurrentWord() {
+            if (gameState.currentWordIndex >= gameState.words.length) {
+                gameWon();
+                return;
+            }
+
+            const currentWordData = gameState.words[gameState.currentWordIndex];
+            gameState.currentWord = currentWordData.word;
+            gameState.currentHint = currentWordData.definition;
+            
+            // Crear anagrama
+            gameState.currentAnagram = createAnagram(gameState.currentWord);
+            
+            // Actualizar UI
+            elements.anagramWord.textContent = gameState.currentAnagram;
+            elements.anagramHint.textContent = gameState.currentHint;
+            elements.answerInput.value = '';
+            elements.answerInput.focus();
+            
+            // Actualizar lista de palabras
+            updateWordsList();
+        }
+
+        // Crear anagrama de una palabra
+        function createAnagram(word) {
+            const letters = word.split('');
+            for (let i = letters.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [letters[i], letters[j]] = [letters[j], letters[i]];
+            }
+            return letters.join('');
+        }
+
+        // Verificar respuesta
+        function checkAnswer() {
+            const userAnswer = elements.answerInput.value.trim().toUpperCase();
+            
+            if (!userAnswer) {
+                showInfo('Por favor, escribe una respuesta.', 'error');
+                return;
+            }
+
+            gameState.totalAttempts++;
+            
+            if (userAnswer === gameState.currentWord) {
+                // Respuesta correcta
+                gameState.correctAttempts++;
+                gameState.score += calculateScore();
+                gameState.solvedWords.push(gameState.currentWord);
+                
+                showInfo(`¡Correcto! "${gameState.currentWord}" es la respuesta.`, 'success');
+                updateStats();
+                
+                // Mostrar modal de éxito
+                document.getElementById('successMessage').textContent = 
+                    `¡Excelente! Has resuelto el anagrama "${gameState.currentWord}"`;
+                showModal('successModal');
+                
+                // Limpiar input
+                elements.answerInput.value = '';
+            } else {
+                // Respuesta incorrecta
+                showInfo(`Incorrecto. Intenta de nuevo.`, 'error');
+                elements.answerInput.value = '';
+                elements.answerInput.focus();
+            }
+        }
+
+        // Calcular puntuación
+        function calculateScore() {
+            const baseScore = 100;
+            const wordLength = gameState.currentWord.length;
+            const lengthBonus = Math.floor(wordLength * 10);
+            const hintPenalty = gameState.hintsUsed * 20;
+            
+            return Math.max(baseScore + lengthBonus - hintPenalty, 50);
+        }
+
+        // Mostrar pista
+        function showHint() {
+            if (gameState.hintsUsed >= 3) {
+                showInfo('Ya has usado todas las pistas disponibles.', 'error');
+                return;
+            }
+            
+            gameState.hintsUsed++;
+            
+            // Mostrar pista más específica
+            let hint = gameState.currentHint;
+            if (gameState.currentWord.length <= 6) {
+                hint = `La palabra tiene ${gameState.currentWord.length} letras`;
+            } else {
+                hint = `Primera letra: ${gameState.currentWord[0]}, última letra: ${gameState.currentWord[gameState.currentWord.length - 1]}`;
+            }
+            
+            elements.anagramHint.textContent = hint;
+            updateStats();
+            
+            showInfo(`Pista usada. Quedan ${3 - gameState.hintsUsed} pistas.`, 'info');
+        }
+
+        // Siguiente palabra
+        function nextWord() {
+            closeModal('successModal');
+            gameState.currentWordIndex++;
+            showCurrentWord();
+        }
+
+        // Nuevo juego
+        function newGame() {
+            if (confirm('¿Estás seguro de que quieres comenzar un nuevo juego? Se perderá el progreso actual.')) {
+                gameState.currentWordIndex = 0;
+                gameState.solvedWords = [];
+                gameState.score = 0;
+                gameState.hintsUsed = 0;
+                gameState.totalAttempts = 0;
+                gameState.correctAttempts = 0;
+                
+                // Recargar palabras
+                loadWordsFromJSON();
+                updateStats();
+                
+                // Reiniciar temporizador
+                if (gameState.timerInterval) {
+                    clearInterval(gameState.timerInterval);
+                }
+                gameState.timer = 0;
+                startTimer();
+            }
+        }
+
+        // Rendirse
+        function giveUp() {
+            if (confirm('¿Estás seguro de que quieres rendirte? Se revelará la respuesta.')) {
+                showInfo(`La respuesta era: "${gameState.currentWord}"`, 'info');
+                elements.anagramWord.textContent = gameState.currentWord;
+                elements.anagramWord.style.color = var(--success);
+            }
+        }
+
+        // Juego ganado
+        function gameWon() {
+            const timeString = elements.timer.textContent;
+            const message = `¡Felicidades! Has completado todos los anagramas en ${timeString}!`;
+            
+            document.getElementById('successMessage').textContent = message;
+            showModal('successModal');
+            
+            // Guardar puntuación
+            saveScore(gameState.score, gameState.timer);
+        }
+
+        // Guardar puntuación
+        function saveScore(score, time) {
+            let scores = JSON.parse(localStorage.getItem('anagramScores') || '[]');
+            scores.push({ score, time, date: new Date().toISOString() });
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 10);
+            localStorage.setItem('anagramScores', JSON.stringify(scores));
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            elements.scoreValue.textContent = gameState.score;
+            elements.wordsSolvedValue.textContent = gameState.solvedWords.length;
+            elements.hintsUsedValue.textContent = gameState.hintsUsed;
+            
+            const accuracy = gameState.totalAttempts > 0 
+                ? Math.round((gameState.correctAttempts / gameState.totalAttempts) * 100)
+                : 100;
+            elements.accuracyValue.textContent = `${accuracy}%`;
+        }
+
+        // Actualizar lista de palabras
+        function updateWordsList() {
+            elements.wordsList.innerHTML = '';
+            
+            gameState.words.forEach((wordData, index) => {
+                const wordItem = document.createElement('div');
+                wordItem.className = 'word-item';
+                
+                const wordText = document.createElement('span');
+                wordText.className = 'word-text';
+                wordText.textContent = wordData.word;
+                
+                const wordStatus = document.createElement('span');
+                wordStatus.className = 'word-status';
+                
+                if (index < gameState.currentWordIndex) {
+                    wordStatus.textContent = '✅';
+                    wordStatus.className = 'word-status found';
+                } else if (index === gameState.currentWordIndex) {
+                    wordStatus.textContent = '⏳';
+                    wordStatus.className = 'word-status pending';
+                } else {
+                    wordStatus.textContent = '🔒';
+                    wordStatus.className = 'word-status pending';
+                }
+                
+                wordItem.appendChild(wordText);
+                wordItem.appendChild(wordStatus);
+                elements.wordsList.appendChild(wordItem);
+            });
+        }
+
+        // Iniciar temporizador
+        function startTimer() {
+            if (gameState.timerInterval) {
+                clearInterval(gameState.timerInterval);
+            }
+            
+            gameState.timer = 0;
+            gameState.timerInterval = setInterval(() => {
+                gameState.timer++;
+                updateTimer();
+            }, 1000);
+        }
+
+        // Actualizar temporizador
+        function updateTimer() {
+            const minutes = Math.floor(gameState.timer / 60);
+            const seconds = gameState.timer % 60;
+            elements.timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        // Mostrar información
+        function showInfo(message, type = 'info') {
+            elements.infoMessage.textContent = message;
+            elements.infoMessage.className = `info-message ${type}`;
+            elements.infoMessage.style.display = 'block';
+            
+            // Ocultar después de 3 segundos
+            setTimeout(() => {
+                elements.infoMessage.style.display = 'none';
+            }, 3000);
+        }
+
+        // Mostrar error
+        function showError(message) {
+            elements.anagramWord.textContent = 'ERROR';
+            elements.anagramHint.textContent = message;
+            elements.anagramWord.style.color = var(--error);
+        }
+
+        // Mostrar modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        // Cerrar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Cerrar modales con Escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal-overlay').forEach(modal => {
+                    modal.style.display = 'none';
+                });
+            }
+        });
+
+        // Cerrar modales haciendo clic fuera
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>

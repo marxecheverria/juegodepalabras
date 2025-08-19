@@ -1,54 +1,51 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
+    <!-- Metaetiquetas para SEO y compatibilidad -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas. Incluye Crucigrama Elite, Juego de Letras, Juego de Cartas y Ahorcado Pro. Ideal para estudiantes, educadores y familias.">
+    <meta name="keywords" content="juegos educativos, crucigrama, ahorcado, vocabulario, ortografía, aprendizaje, educación, palabras, letras, cartas, interactivo, español">
+    <meta name="author" content="Marx Echeverría">
+    <meta name="robots" content="index, follow">
+    <meta name="language" content="es">
+    <meta name="revisit-after" content="7 days">
+    <meta name="application-name" content="Juegos de Palabras">
+    <meta name="category" content="Educación">
+    <meta name="coverage" content="Worldwide">
+    <meta name="distribution" content="Global">
+    <meta name="rating" content="General">
+    <meta name="theme-color" content="#8B9DC3">
+
+    <!-- Open Graph para redes sociales -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ezequielrifa.imaynalla.org/">
+    <meta property="og:title" content="🎮 Juegos de Palabras - Suite Educativa Interactiva">
+    <meta property="og:description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas. Incluye Crucigrama Elite, Juego de Letras, Juego de Cartas y Ahorcado Pro.">
+    <meta property="og:image" content="https://ezequielrifa.imaynalla.org/og-image.jpg">
+    <meta property="og:site_name" content="Juegos de Palabras">
+    <meta property="og:locale" content="es_ES">
+
+    <!-- Twitter Card -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://ezequielrifa.imaynalla.org/">
+    <meta property="twitter:title" content="🎮 Juegos de Palabras - Suite Educativa Interactiva">
+    <meta property="twitter:description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas.">
+    <meta property="twitter:image" content="https://ezequielrifa.imaynalla.org/twitter-image.jpg">
+
+    <!-- Título de la página -->
     <title>🎮 Juegos de Palabras - Suite Educativa Interactiva</title>
+
+    <!-- Fuentes de Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Estilos CSS -->
     <style>
+        /* Definición de variables CSS para mantener consistencia en colores, espaciados y transiciones */
         :root {
-            /* Paleta de colores coherente con los juegos */
+            /* Paleta de colores */
             --primary: #8B9DC3;
             --primary-dark: #6B7A9A;
             --secondary: #D4A5A5;
@@ -57,19 +54,19 @@
             --warning: #D4A574;
             --error: #C4A484;
 
-            /* Colores de fondo modernos */
+            /* Fondos */
             --bg-primary: #F8FAFC;
             --bg-secondary: #F1F5F9;
             --bg-tertiary: #E2E8F0;
             --bg-card: #FFFFFF;
             --bg-glass: rgba(139, 157, 195, 0.1);
 
-            /* Colores de texto modernos */
+            /* Colores de texto */
             --text-primary: #1E293B;
             --text-secondary: #475569;
             --text-muted: #64748B;
 
-            /* Gradientes modernos y suaves */
+            /* Gradientes */
             --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
             --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
             --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
@@ -77,7 +74,7 @@
             --gradient-error: linear-gradient(135deg, #C4A484 0%, #D4B494 100%);
             --gradient-ahorcado: linear-gradient(135deg, #6B7A9A 0%, #8B9DC3 100%);
 
-            /* Sombras modernas y suaves */
+            /* Sombras */
             --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
             --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
             --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
@@ -100,6 +97,7 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
+        /* Estilos globales */
         * {
             margin: 0;
             padding: 0;
@@ -115,7 +113,7 @@
             position: relative;
         }
 
-        /* Fondo animado moderno con partículas suaves */
+        /* Fondo animado con gradientes radiales */
         body::before {
             content: '';
             position: fixed;
@@ -146,7 +144,7 @@
             flex-direction: column;
         }
 
-        /* Header principal */
+        /* Estilos del header */
         .main-header {
             text-align: center;
             margin-bottom: var(--space-xl);
@@ -205,7 +203,7 @@
             margin-bottom: var(--space-xl);
         }
 
-        /* Tarjetas de juego */
+        /* Estilos de las tarjetas de juego */
         .game-card {
             background: var(--bg-card);
             border-radius: var(--radius-xl);
@@ -248,37 +246,15 @@
             outline-offset: 2px;
         }
 
-        .game-card.crucigrama:hover {
-            border-color: var(--accent);
-        }
-
-        .game-card.crucigrama::before {
-            background: var(--gradient-accent);
-        }
-
-        .game-card.letras:hover {
-            border-color: var(--success);
-        }
-
-        .game-card.letras::before {
-            background: var(--gradient-success);
-        }
-
-        .game-card.cartas:hover {
-            border-color: var(--secondary);
-        }
-
-        .game-card.cartas::before {
-            background: var(--gradient-secondary);
-        }
-
-        .game-card.ahorcado:hover {
-            border-color: var(--error);
-        }
-
-        .game-card.ahorcado::before {
-            background: var(--gradient-error);
-        }
+        /* Estilos específicos por juego */
+        .game-card.crucigrama:hover { border-color: var(--accent); }
+        .game-card.crucigrama::before { background: var(--gradient-accent); }
+        .game-card.letras:hover { border-color: var(--success); }
+        .game-card.letras::before { background: var(--gradient-success); }
+        .game-card.cartas:hover { border-color: var(--secondary); }
+        .game-card.cartas::before { background: var(--gradient-secondary); }
+        .game-card.ahorcado:hover { border-color: var(--error); }
+        .game-card.ahorcado::before { background: var(--gradient-error); }
 
         .game-icon {
             font-size: 4rem;
@@ -345,31 +321,18 @@
             box-shadow: var(--shadow-md);
         }
 
-        .game-button:focus {
-            outline: 3px solid var(--accent);
-            outline-offset: 2px;
-        }
-
+        .game-button:focus,
         .game-button:focus-visible {
             outline: 3px solid var(--accent);
             outline-offset: 2px;
         }
 
-        .game-card.crucigrama .game-button {
-            background: var(--gradient-accent);
-        }
-
-        .game-card.letras .game-button {
-            background: var(--gradient-success);
-        }
-
-        .game-card.cartas .game-button {
-            background: var(--gradient-secondary);
-        }
-
-        .game-card.ahorcado .game-button {
-            background: var(--gradient-ahorcado);
-        }
+        /* Botones específicos por juego */
+        .game-card.crucigrama .game-button { background: var(--gradient-accent); }
+        .game-card.letras .game-button { background: var(--gradient-success); }
+        .game-card.anagramas .game-button { background: var(--gradient-primary); }
+        .game-card.cartas .game-button { background: var(--gradient-secondary); }
+        .game-card.ahorcado .game-button { background: var(--gradient-ahorcado); }
 
         /* Sección de estadísticas */
         .stats-section {
@@ -452,31 +415,16 @@
             transform: translateY(-2px);
         }
 
-        /* Responsive */
+        /* Estilos responsive */
         @media (max-width: 768px) {
-            .main-title {
-                font-size: 3rem;
-            }
-
-            .games-grid {
-                grid-template-columns: 1fr;
-                gap: var(--space-md);
-            }
-
-            .game-card {
-                padding: var(--space-md);
-            }
-
-            .game-title {
-                font-size: 2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
+            .main-title { font-size: 3rem; }
+            .games-grid { grid-template-columns: 1fr; gap: var(--space-md); }
+            .game-card { padding: var(--space-md); }
+            .game-title { font-size: 2rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
         }
 
-        /* Animaciones de entrada */
+        /* Animaciones de entrada para tarjetas */
         .game-card {
             animation: fadeInUp 0.6s ease forwards;
             opacity: 0;
@@ -489,10 +437,7 @@
         .game-card:nth-child(4) { animation-delay: 0.4s; }
 
         @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Scrollbar personalizada */
@@ -516,8 +461,9 @@
     </style>
 </head>
 <body>
+    <!-- Contenedor principal -->
     <div class="main-container">
-        <!-- Header principal -->
+        <!-- Header con título y descripción -->
         <header class="main-header">
             <h1 class="main-title" lang="es">🎮 Juegos de Palabras</h1>
             <p class="main-subtitle" lang="es">Suite Educativa Interactiva para Aprender y Divertirse</p>
@@ -528,7 +474,7 @@
             </p>
         </header>
 
-        <!-- Grid de juegos -->
+        <!-- Sección principal con grid de juegos -->
         <main class="games-grid" role="main">
             <!-- Crucigrama Elite -->
             <a href="crucigrama.html" class="game-card crucigrama" aria-label="Jugar Crucigrama Elite">
@@ -562,6 +508,24 @@
                     <li lang="es">Puntuación dinámica</li>
                     <li lang="es">Múltiples niveles de dificultad</li>
                     <li lang="es">Modo multijugador local</li>
+                </ul>
+                <span class="game-button" lang="es">🎯 Jugar Ahora</span>
+            </a>
+
+            <!-- Juego de Anagramas -->
+            <a href="anagramas.html" class="game-card anagramas" aria-label="Jugar Juego de Anagramas">
+                <div class="game-icon">🎯</div>
+                <h2 class="game-title" lang="es">Anagramas</h2>
+                <p class="game-description" lang="es">
+                    Descubre la palabra original reorganizando las letras desordenadas. 
+                    Ejercita tu mente y mejora tu vocabulario con este desafío intelectual.
+                </p>
+                <ul class="game-features">
+                    <li lang="es">Palabras de múltiples categorías</li>
+                    <li lang="es">Sistema de pistas inteligente</li>
+                    <li lang="es">Puntuación dinámica por dificultad</li>
+                    <li lang="es">Temporizador y estadísticas</li>
+                    <li lang="es">Interfaz moderna y responsiva</li>
                 </ul>
                 <span class="game-button" lang="es">🎯 Jugar Ahora</span>
             </a>
@@ -645,25 +609,75 @@
         </footer>
     </div>
 
+    <!-- Scripts JavaScript -->
     <script>
-        // Animaciones adicionales y funcionalidades interactivas
-        document.addEventListener('DOMContentLoaded', () => {
-            // Efecto de hover mejorado para las tarjetas
-            const gameCards = document.querySelectorAll('.game-card');
+        // Variables globales para manejo de archivos XLSX
+        let gk_isXlsx = false;
+        const gk_xlsxFileLookup = {};
+        const gk_fileData = {};
 
+        /**
+         * Verifica si una celda tiene contenido válido
+         * @param {any} cell - Valor de la celda
+         * @returns {boolean} - True si la celda no está vacía o nula
+         */
+        function filledCell(cell) {
+            return cell !== '' && cell != null;
+        }
+
+        /**
+         * Carga y procesa datos de un archivo XLSX o retorna datos en crudo
+         * @param {string} filename - Nombre del archivo
+         * @returns {string} - Datos en formato CSV o texto plano
+         */
+        function loadFileData(filename) {
+            if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+                try {
+                    // Leer archivo XLSX y convertir a JSON
+                    const workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+
+                    // Convertir hoja a JSON filtrando filas vacías
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                    const filteredData = jsonData.filter(row => row.some(filledCell));
+
+                    // Encontrar la fila de encabezado heurísticamente
+                    let headerRowIndex = filteredData.findIndex((row, index) =>
+                        row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                    );
+                    if (headerRowIndex === -1 || headerRowIndex > 25) {
+                        headerRowIndex = 0;
+                    }
+
+                    // Convertir datos filtrados a CSV
+                    const csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                    return XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                } catch (e) {
+                    console.error('Error procesando archivo XLSX:', e);
+                    return "";
+                }
+            }
+            return gk_fileData[filename] || "";
+        }
+
+        /**
+         * Inicializa animaciones y funcionalidades interactivas al cargar el DOM
+         */
+        document.addEventListener('DOMContentLoaded', () => {
+            // Efecto hover para tarjetas de juego
+            const gameCards = document.querySelectorAll('.game-card');
             gameCards.forEach(card => {
                 card.addEventListener('mouseenter', () => {
                     card.style.transform = 'translateY(-8px) scale(1.02)';
                 });
-
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = 'translateY(0) scale(1)';
                 });
             });
 
-            // Contador animado para las estadísticas
+            // Animación de contadores para estadísticas
             const statNumbers = document.querySelectorAll('.stat-number');
-
             const animateCounter = (element, target, suffix = '') => {
                 let current = 0;
                 const increment = target / 50;
@@ -677,7 +691,7 @@
                 }, 30);
             };
 
-            // Observador de intersección para animar contadores
+            // Observador para animar contadores al entrar en vista
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -698,12 +712,15 @@
 
             statNumbers.forEach(stat => observer.observe(stat));
 
-            // Efecto de partículas flotantes
+            // Crear partículas flotantes
             if (!document.querySelector('.particles-container')) {
                 createFloatingParticles();
             }
         });
 
+        /**
+         * Crea partículas flotantes animadas para el fondo
+         */
         function createFloatingParticles() {
             const particlesContainer = document.createElement('div');
             particlesContainer.className = 'particles-container';
@@ -719,6 +736,7 @@
             `;
             document.body.appendChild(particlesContainer);
 
+            // Generar 10 partículas con animaciones aleatorias
             for (let i = 0; i < 10; i++) {
                 const particle = document.createElement('div');
                 particle.style.cssText = `
@@ -736,7 +754,7 @@
                 particlesContainer.appendChild(particle);
             }
 
-            // Agregar CSS para la animación de flotación
+            // Definir animación de flotación
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes float {
