@@ -37,31 +37,64 @@
     <meta name="rating" content="General">
     <meta name="theme-color" content="#8B9DC3">
     
-    <!-- Favicon y enlaces de recursos -->
+    <!-- Favicon esencial - solo para LCP crítico -->
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
+    
+    <!-- Carga diferida de favicons adicionales -->
+    <script>
+        // Cargar favicons adicionales después de la renderización crítica
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                const favicons = [
+                    { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
+                    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
+                    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
+                    { rel: 'manifest', href: '/site.webmanifest' }
+                ];
+                
+                favicons.forEach(favicon => {
+                    const link = document.createElement('link');
+                    Object.assign(link, favicon);
+                    document.head.appendChild(link);
+                });
+            });
+        }
+    </script>
     
     <!-- Canonical URL para evitar contenido duplicado -->
     <link rel="canonical" href="https://ezequielrifa.imaynalla.org/">
     
-    <!-- Preload de recursos críticos -->
+    <!-- Preload de recursos críticos - optimizado -->
     <link rel="preload" href="words.json" as="fetch" crossorigin>
     <link rel="dns-prefetch" href="//fonts.googleapis.com">
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
+    
+    <!-- Preload de imágenes críticas si existen -->
+    <link rel="preload" href="/og-image.jpg" as="image" media="(min-width: 768px)">
     
     <!-- Preconexiones para fuentes web -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
-    <!-- Fuentes web optimizadas con font-display: swap -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Fuentes web optimizadas - solo variantes críticas -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
     
-    <!-- Preload de fuentes críticas -->
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap"></noscript>
+    <!-- Carga diferida de fuentes no críticas -->
+    <script>
+        // Cargar fuentes adicionales después de la renderización crítica
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap';
+                document.head.appendChild(link);
+            });
+        }
+    </script>
+    
+    <!-- CSS completo cargado de forma diferida -->
+    <link rel="stylesheet" href="styles-complete.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="styles-complete.css"></noscript>
     <!-- CSS crítico inline para renderización inmediata -->
     <style>
         /* Estilos críticos para LCP */
@@ -127,59 +160,19 @@
             font-family: inherit;
         }
         
-        /* Resto de estilos CSS */
+        /* Variables CSS críticas - solo las esenciales para LCP */
         :root {
-            /* Paleta de colores coherente con los juegos */
             --primary: #8B9DC3;
-            --primary-dark: #6B7A9A;
-            --secondary: #D4A5A5;
-            --accent: #E6B17A;
-            --success: #9CAF88;
-            --warning: #D4A574;
-            --error: #C4A484;
-            
-            /* Colores de fondo modernos */
             --bg-primary: #F8FAFC;
-            --bg-secondary: #F1F5F9;
-            --bg-tertiary: #E2E8F0;
             --bg-card: #FFFFFF;
-            --bg-glass: rgba(139, 157, 195, 0.1);
-            
-            /* Colores de texto modernos */
             --text-primary: #1E293B;
             --text-secondary: #475569;
-            --text-muted: #64748B;
-            
-            /* Gradientes modernos y suaves */
-            --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
-            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
-            --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
-            --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
-            --gradient-error: linear-gradient(135deg, #C4A484 0%, #D4B494 100%);
-            --gradient-ahorcado: linear-gradient(135deg, #6B7A9A 0%, #8B9DC3 100%);
-            
-            /* Sombras modernas y suaves */
-            --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
             --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
-            --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
-            --shadow-glow: 0 0 20px rgba(139, 157, 195, 0.3);
-            
-            /* Espaciado */
-            --space-xs: 0.5rem;
-            --space-sm: 1rem;
-            --space-md: 1.5rem;
-            --space-lg: 2rem;
-            --space-xl: 3rem;
-            
-            /* Bordes */
-            --radius-sm: 8px;
-            --radius-md: 12px;
             --radius-lg: 20px;
-            --radius-xl: 32px;
-            
-            /* Transiciones */
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
+        
+        /* CSS completo se carga de forma diferida */
 
         * {
             margin: 0;
@@ -791,7 +784,7 @@
         }
 
         function initializeAnimations() {
-            // Animaciones adicionales y funcionalidades interactivas
+            // Solo funcionalidades críticas para LCP
             document.addEventListener('DOMContentLoaded', () => {
             // Efecto de hover mejorado para las tarjetas
             const gameCards = document.querySelectorAll('.game-card');
@@ -855,10 +848,23 @@
 
             statNumbers.forEach(stat => observer.observe(stat));
 
-            // Efecto de partículas flotantes
-            createFloatingParticles();
+            // Solo funcionalidades esenciales para LCP
         });
         } // Cerrar la función initializeAnimations
+
+        // Carga diferida de funcionalidades no críticas
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(() => {
+                loadNonCriticalFeatures();
+            });
+        } else {
+            setTimeout(loadNonCriticalFeatures, 2000);
+        }
+
+        function loadNonCriticalFeatures() {
+            // Efecto de partículas flotantes
+            createFloatingParticles();
+        }
 
         function createFloatingParticles() {
             const particlesContainer = document.createElement('div');
