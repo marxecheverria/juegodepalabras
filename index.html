@@ -1,185 +1,104 @@
-<!DOCTYPE html>
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎮 Juegos de Palabras - Suite Educativa Interactiva</title>
-    
-    <!-- Metaetiquetas para SEO y comprensión del contenido -->
-    <meta name="description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas. Incluye Crucigrama Elite, Juego de Letras, Juego de Cartas y Ahorcado Pro. Ideal para estudiantes, educadores y familias.">
-    <meta name="keywords" content="juegos educativos, crucigrama, ahorcado, vocabulario, ortografía, aprendizaje, educación, palabras, letras, cartas, interactivo, español">
-    <meta name="author" content="Marx Echeverría">
-    <meta name="robots" content="index, follow">
-    <meta name="language" content="es">
-    <meta name="revisit-after" content="7 days">
-    
-    <!-- Open Graph / Facebook -->
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ezequielrifa.imaynalla.org/">
-    <meta property="og:title" content="🎮 Juegos de Palabras - Suite Educativa Interactiva">
-    <meta property="og:description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas. Incluye Crucigrama Elite, Juego de Letras, Juego de Cartas y Ahorcado Pro.">
-    <meta property="og:image" content="https://ezequielrifa.imaynalla.org/og-image.jpg">
-    <meta property="og:site_name" content="Juegos de Palabras">
-    <meta property="og:locale" content="es_ES">
-    
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://ezequielrifa.imaynalla.org/">
-    <meta property="twitter:title" content="🎮 Juegos de Palabras - Suite Educativa Interactiva">
-    <meta property="twitter:description" content="Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas.">
-    <meta property="twitter:image" content="https://ezequielrifa.imaynalla.org/twitter-image.jpg">
-    
-    <!-- Información adicional para rastreadores -->
-    <meta name="application-name" content="Juegos de Palabras">
-    <meta name="category" content="Educación">
-    <meta name="coverage" content="Worldwide">
-    <meta name="distribution" content="Global">
-    <meta name="rating" content="General">
-    <meta name="theme-color" content="#8B9DC3">
-    
-    <!-- Metaetiquetas de seguridad y HTTPS -->
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
-    <meta http-equiv="Strict-Transport-Security" content="max-age=31536000; includeSubDomains; preload">
-    <meta http-equiv="X-Content-Type-Options" content="nosniff">
-    <meta http-equiv="X-Frame-Options" content="DENY">
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block">
-    
-    <!-- Favicon esencial - solo para LCP crítico -->
-    <link rel="icon" type="image/x-icon" href="/favicon.ico">
-    
-    <!-- Carga diferida de favicons adicionales -->
-    <script>
-        // Cargar favicons adicionales después de la renderización crítica
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-                const favicons = [
-                    { rel: 'apple-touch-icon', sizes: '180x180', href: '/apple-touch-icon.png' },
-                    { rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32x32.png' },
-                    { rel: 'icon', type: 'image/png', sizes: '16x16', href: '/favicon-16x16.png' },
-                    { rel: 'manifest', href: '/site.webmanifest' }
-                ];
-                
-                favicons.forEach(favicon => {
-                    const link = document.createElement('link');
-                    Object.assign(link, favicon);
-                    document.head.appendChild(link);
-                });
-            });
-        }
-    </script>
-    
-    <!-- Canonical URL para evitar contenido duplicado -->
-    <link rel="canonical" href="https://ezequielrifa.imaynalla.org/">
-    
-    <!-- Preload de recursos críticos - optimizado -->
-    <link rel="preload" href="words.json" as="fetch" crossorigin>
-    <link rel="dns-prefetch" href="//fonts.googleapis.com">
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    
-    <!-- Preload de imágenes críticas si existen -->
-    <link rel="preload" href="/og-image.jpg" as="image" media="(min-width: 768px)">
-    
-    <!-- Preconexiones para fuentes web -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Fuentes web optimizadas - solo variantes críticas -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600&display=swap" rel="stylesheet">
-    
-    <!-- Carga diferida de fuentes no críticas -->
-    <script>
-        // Cargar fuentes adicionales después de la renderización crítica
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-                const link = document.createElement('link');
-                link.rel = 'stylesheet';
-                link.href = 'https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap';
-                document.head.appendChild(link);
-            });
-        }
-    </script>
-    
-    <!-- CSS completo cargado de forma diferida -->
-    <link rel="stylesheet" href="styles-complete.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="styles-complete.css"></noscript>
-    <!-- CSS crítico inline para renderización inmediata -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Estilos críticos para LCP */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: #F8FAFC;
-            color: #1E293B;
-            min-height: 100vh;
-        }
-        
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 1rem;
-        }
-        
-        .main-title {
-            font-size: 3.5rem;
-            font-weight: 800;
-            text-align: center;
-            margin-bottom: 1rem;
-            color: #8B9DC3;
-        }
-        
-        .main-subtitle {
-            font-size: 1.5rem;
-            text-align: center;
-            margin-bottom: 3rem;
-            color: #475569;
-        }
-        
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 2rem;
-            margin-bottom: 3rem;
-        }
-        
-        .game-card {
-            background: #FFFFFF;
-            border-radius: 20px;
-            padding: 2rem;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid rgba(139, 157, 195, 0.1);
-            box-shadow: 0 4px 16px rgba(139, 157, 195, 0.2);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .game-button {
-            background: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
-            color: #FFFFFF;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 12px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            width: 100%;
-            font-family: inherit;
-        }
-        
-        /* Variables CSS críticas - solo las esenciales para LCP */
         :root {
+            /* Paleta de colores coherente con los juegos */
             --primary: #8B9DC3;
+            --primary-dark: #6B7A9A;
+            --secondary: #D4A5A5;
+            --accent: #E6B17A;
+            --success: #9CAF88;
+            --warning: #D4A574;
+            --error: #C4A484;
+
+            /* Colores de fondo modernos */
             --bg-primary: #F8FAFC;
+            --bg-secondary: #F1F5F9;
+            --bg-tertiary: #E2E8F0;
             --bg-card: #FFFFFF;
+            --bg-glass: rgba(139, 157, 195, 0.1);
+
+            /* Colores de texto modernos */
             --text-primary: #1E293B;
             --text-secondary: #475569;
+            --text-muted: #64748B;
+
+            /* Gradientes modernos y suaves */
+            --gradient-primary: linear-gradient(135deg, #8B9DC3 0%, #A8B8D4 100%);
+            --gradient-secondary: linear-gradient(135deg, #D4A5A5 0%, #E0B8B8 100%);
+            --gradient-accent: linear-gradient(135deg, #E6B17A 0%, #F0C490 100%);
+            --gradient-success: linear-gradient(135deg, #9CAF88 0%, #B4C9A3 100%);
+            --gradient-error: linear-gradient(135deg, #C4A484 0%, #D4B494 100%);
+            --gradient-ahorcado: linear-gradient(135deg, #6B7A9A 0%, #8B9DC3 100%);
+
+            /* Sombras modernas y suaves */
+            --shadow-sm: 0 2px 8px rgba(139, 157, 195, 0.15);
             --shadow-md: 0 4px 16px rgba(139, 157, 195, 0.2);
+            --shadow-lg: 0 8px 32px rgba(139, 157, 195, 0.25);
+            --shadow-glow: 0 0 20px rgba(139, 157, 195, 0.3);
+
+            /* Espaciado */
+            --space-xs: 0.5rem;
+            --space-sm: 1rem;
+            --space-md: 1.5rem;
+            --space-lg: 2rem;
+            --space-xl: 3rem;
+
+            /* Bordes */
+            --radius-sm: 8px;
+            --radius-md: 12px;
             --radius-lg: 20px;
+            --radius-xl: 32px;
+
+            /* Transiciones */
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        
-        /* CSS completo se carga de forma diferida */
 
         * {
             margin: 0;
@@ -188,7 +107,7 @@
         }
 
         body {
-            font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Outfit', sans-serif;
             background: var(--bg-primary);
             color: var(--text-primary);
             min-height: 100vh;
@@ -209,7 +128,7 @@
                 radial-gradient(circle at 80% 20%, rgba(212, 165, 165, 0.06) 0%, transparent 50%),
                 radial-gradient(circle at 40% 40%, rgba(230, 177, 122, 0.04) 0%, transparent 50%);
             animation: backgroundShift 20s ease-in-out infinite;
-            z-index: -1;
+            z-index: -2;
         }
 
         @keyframes backgroundShift {
@@ -299,6 +218,7 @@
             cursor: pointer;
             text-decoration: none;
             color: inherit;
+            will-change: transform, box-shadow;
         }
 
         .game-card::before {
@@ -321,6 +241,11 @@
             transform: translateY(-8px);
             box-shadow: var(--shadow-glow);
             border-color: var(--primary);
+        }
+
+        .game-card:focus-within {
+            outline: 3px solid var(--accent);
+            outline-offset: 2px;
         }
 
         .game-card.crucigrama:hover {
@@ -411,6 +336,8 @@
             transition: var(--transition);
             width: 100%;
             font-family: 'Outfit', sans-serif;
+            display: block;
+            text-align: center;
         }
 
         .game-button:hover {
@@ -418,7 +345,6 @@
             box-shadow: var(--shadow-md);
         }
 
-        /* Estilos adicionales para accesibilidad */
         .game-button:focus {
             outline: 3px solid var(--accent);
             outline-offset: 2px;
@@ -431,30 +357,18 @@
 
         .game-card.crucigrama .game-button {
             background: var(--gradient-accent);
-            color: var(--bg-card);
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.letras .game-button {
             background: var(--gradient-success);
-            color: var(--bg-card);
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.cartas .game-button {
             background: var(--gradient-secondary);
-            color: var(--bg-card);
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         .game-card.ahorcado .game-button {
             background: var(--gradient-ahorcado);
-            color: var(--bg-card);
-            font-weight: 700;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
 
         /* Sección de estadísticas */
@@ -538,47 +452,25 @@
             transform: translateY(-2px);
         }
 
-        /* Indicador de seguridad HTTPS */
-        .security-info {
-            text-align: center;
-            margin-top: var(--space-md);
-            padding: var(--space-sm);
-            background: var(--gradient-success);
-            border-radius: var(--radius-md);
-            color: var(--bg-card);
-        }
-
-        .security-badge {
-            display: block;
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: var(--space-xs);
-        }
-
-        .security-text {
-            font-size: 0.9rem;
-            opacity: 0.9;
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .main-title {
                 font-size: 3rem;
             }
-            
+
             .games-grid {
                 grid-template-columns: 1fr;
                 gap: var(--space-md);
             }
-            
+
             .game-card {
                 padding: var(--space-md);
             }
-            
+
             .game-title {
                 font-size: 2rem;
             }
-            
+
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -627,9 +519,9 @@
     <div class="main-container">
         <!-- Header principal -->
         <header class="main-header">
-            <h1 class="main-title">🎮 Juegos de Palabras</h1>
-            <p class="main-subtitle">Suite Educativa Interactiva para Aprender y Divertirse</p>
-            <p class="main-description">
+            <h1 class="main-title" lang="es">🎮 Juegos de Palabras</h1>
+            <p class="main-subtitle" lang="es">Suite Educativa Interactiva para Aprender y Divertirse</p>
+            <p class="main-description" lang="es">
                 Descubre nuestra colección de juegos educativos diseñados para mejorar el vocabulario, 
                 la ortografía y las habilidades cognitivas. Cada juego ofrece una experiencia única 
                 y desafiante para todas las edades.
@@ -637,224 +529,142 @@
         </header>
 
         <!-- Grid de juegos -->
-        <main class="games-grid">
+        <main class="games-grid" role="main">
             <!-- Crucigrama Elite -->
-            <a href="crucigrama.html" class="game-card crucigrama">
+            <a href="crucigrama.html" class="game-card crucigrama" aria-label="Jugar Crucigrama Elite">
                 <div class="game-icon">🧩</div>
-                <h2 class="game-title">Crucigrama Elite</h2>
-                <p class="game-description">
+                <h2 class="game-title" lang="es">Crucigrama Elite</h2>
+                <p class="game-description" lang="es">
                     El juego más completo y desafiante de la suite. Resuelve crucigramas dinámicos 
                     con más de 220 palabras organizadas en 11 categorías temáticas.
                 </p>
                 <ul class="game-features">
-                    <li>Matriz dinámica 15x15</li>
-                    <li>Navegación inteligente con teclado</li>
-                    <li>Sistema de pistas avanzado</li>
-                    <li>Palabras aleatorias cada partida</li>
-                    <li>11 categorías temáticas</li>
+                    <li lang="es">Matriz dinámica 15x15</li>
+                    <li lang="es">Navegación inteligente con teclado</li>
+                    <li lang="es">Sistema de pistas avanzado</li>
+                    <li lang="es">Palabras aleatorias cada partida</li>
+                    <li lang="es">11 categorías temáticas</li>
                 </ul>
-                <div class="game-button" role="button" aria-label="Jugar al Crucigrama Elite">🎯 Jugar Ahora</div>
+                <span class="game-button" lang="es">🎯 Jugar Ahora</span>
             </a>
 
             <!-- Juego de Letras -->
-            <a href="letras.html" class="game-card letras">
+            <a href="letras.html" class="game-card letras" aria-label="Jugar Juego de Letras">
                 <div class="game-icon">🔤</div>
-                <h2 class="game-title">Juego de Letras</h2>
-                <p class="game-description">
+                <h2 class="game-title" lang="es">Juego de Letras</h2>
+                <p class="game-description" lang="es">
                     Desafía tu vocabulario formando palabras con letras aleatorias. 
                     Mejora tu ortografía y expande tu conocimiento del idioma español.
                 </p>
                 <ul class="game-features">
-                    <li>Sistema de letras aleatorias</li>
-                    <li>Validación en tiempo real</li>
-                    <li>Puntuación dinámica</li>
-                    <li>Múltiples niveles de dificultad</li>
-                    <li>Modo multijugador local</li>
+                    <li lang="es">Sistema de letras aleatorias</li>
+                    <li lang="es">Validación en tiempo real</li>
+                    <li lang="es">Puntuación dinámica</li>
+                    <li lang="es">Múltiples niveles de dificultad</li>
+                    <li lang="es">Modo multijugador local</li>
                 </ul>
-                <div class="game-button" role="button" aria-label="Jugar al Juego de Letras">🎯 Jugar Ahora</div>
+                <span class="game-button" lang="es">🎯 Jugar Ahora</span>
             </a>
 
             <!-- Juego de Cartas -->
-            <a href="cartas.html" class="game-card cartas">
+            <a href="cartas.html" class="game-card cartas" aria-label="Jugar Juego de Cartas">
                 <div class="game-icon">🃏</div>
-                <h2 class="game-title">Juego de Cartas</h2>
-                <p class="game-description">
+                <h2 class="game-title" lang="es">Juego de Cartas</h2>
+                <p class="game-description" lang="es">
                     Ejercita tu memoria y habilidades de asociación con este juego 
                     de cartas interactivo. Perfecto para todas las edades.
                 </p>
                 <ul class="game-features">
-                    <li>Cartas interactivas animadas</li>
-                    <li>Modo memoria para emparejar</li>
-                    <li>Diferentes temas y categorías</li>
-                    <li>Puntuación progresiva</li>
-                    <li>Interfaz intuitiva</li>
+                    <li lang="es">Cartas interactivas animadas</li>
+                    <li lang="es">Modo memoria para emparejar</li>
+                    <li lang="es">Diferentes temas y categorías</li>
+                    <li lang="es">Puntuación progresiva</li>
+                    <li lang="es">Interfaz intuitiva</li>
                 </ul>
-                <div class="game-button" role="button" aria-label="Jugar al Juego de Cartas">🎯 Jugar Ahora</div>
+                <span class="game-button" lang="es">🎯 Jugar Ahora</span>
             </a>
 
             <!-- Ahorcado -->
-            <a href="ahorcado.html" class="game-card ahorcado">
+            <a href="ahorcado.html" class="game-card ahorcado" aria-label="Jugar Ahorcado">
                 <div class="game-icon">🎯</div>
-                <h2 class="game-title">Ahorcado</h2>
-                <p class="game-description">
+                <h2 class="game-title" lang="es">Ahorcado</h2>
+                <p class="game-description" lang="es">
                     ¡Salva al personaje adivinando la palabra letra por letra! 
                     Usa tu vocabulario y lógica para descubrir la palabra oculta antes de que se complete el ahorcado.
                 </p>
                 <ul class="game-features">
-                    <li>Palabras aleatorias de múltiples categorías</li>
-                    <li>Dibujo del ahorcado que se va completando</li>
-                    <li>Teclado virtual interactivo</li>
-                    <li>Sistema de pistas y ayudas</li>
-                    <li>Puntuación basada en intentos restantes</li>
+                    <li lang="es">Palabras aleatorias de múltiples categorías</li>
+                    <li lang="es">Dibujo del ahorcado que se va completando</li>
+                    <li lang="es">Teclado virtual interactivo</li>
+                    <li lang="es">Sistema de pistas y ayudas</li>
+                    <li lang="es">Puntuación basada en intentos restantes</li>
                 </ul>
-                <div class="game-button" role="button" aria-label="Jugar al Ahorcado">🎯 Jugar Ahora</div>
+                <span class="game-button" lang="es">🎯 Jugar Ahora</span>
             </a>
         </main>
 
         <!-- Sección de estadísticas -->
         <section class="stats-section">
-            <h2 class="stats-title">📊 Estadísticas del Proyecto</h2>
+            <h2 class="stats-title" lang="es">📊 Estadísticas del Proyecto</h2>
             <div class="stats-grid">
                 <div class="stat-item">
                     <div class="stat-number">4</div>
-                    <div class="stat-label">Juegos Disponibles</div>
+                    <div class="stat-label" lang="es">Juegos Disponibles</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">220+</div>
-                    <div class="stat-label">Palabras en Crucigrama</div>
+                    <div class="stat-label" lang="es">Palabras en Crucigrama</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">11</div>
-                    <div class="stat-label">Categorías Temáticas</div>
+                    <div class="stat-label" lang="es">Categorías Temáticas</div>
                 </div>
                 <div class="stat-item">
                     <div class="stat-number">100%</div>
-                    <div class="stat-label">Responsive Design</div>
+                    <div class="stat-label" lang="es">Responsive Design</div>
                 </div>
             </div>
         </section>
 
         <!-- Footer -->
         <footer class="main-footer">
-            <p class="footer-text">
+            <p class="footer-text" lang="es">
                 Desarrollado con ❤️ por Marx Echeverría para la comunidad educativa
             </p>
             <div class="footer-links">
-                <a href="https://github.com/marxecheverria/juegodepalabras" class="footer-link" target="_blank">
+                <a href="https://github.com/marxecheverria/juegodepalabras" class="footer-link" target="_blank" rel="noopener" lang="es">
                     📁 Ver en GitHub
                 </a>
-                <a href="INSTRUCCIONES.md" class="footer-link">
+                <a href="INSTRUCCIONES.md" class="footer-link" lang="es">
                     📖 Instrucciones
                 </a>
-                <a href="INSTRUCCIONES_OPTIMIZACION.md" class="footer-link">
+                <a href="INSTRUCCIONES_OPTIMIZACION.md" class="footer-link" lang="es">
                     🔧 Documentación Técnica
                 </a>
-            </div>
-            <div class="security-info">
-                <span class="security-badge">🔒 HTTPS Seguro</span>
-                <span class="security-text">Tu conexión está protegida</span>
             </div>
         </footer>
     </div>
 
-    <!-- Esquema JSON-LD estructurado para SEO -->
-    <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "WebApplication",
-        "name": "Juegos de Palabras - Suite Educativa Interactiva",
-        "description": "Suite completa de juegos educativos interactivos para mejorar vocabulario, ortografía y habilidades cognitivas. Incluye Crucigrama Elite, Juego de Letras, Juego de Cartas y Ahorcado Pro.",
-        "url": "https://ezequielrifa.imaynalla.org/",
-        "applicationCategory": "EducationalApplication",
-        "operatingSystem": "Web Browser",
-        "browserRequirements": "Requires JavaScript. Requires HTML5.",
-        "author": {
-            "@type": "Person",
-            "name": "Marx Echeverría",
-            "url": "https://github.com/marxecheverria"
-        },
-        "creator": {
-            "@type": "Person",
-            "name": "Marx Echeverría"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": "Juegos de Palabras",
-            "url": "https://ezequielrifa.imaynalla.org/"
-        },
-        "offers": {
-            "@type": "Offer",
-            "price": "0",
-            "priceCurrency": "USD"
-        },
-        "audience": {
-            "@type": "Audience",
-            "audienceType": "Estudiantes, Educadores, Familias"
-        },
-        "educationalLevel": "All Ages",
-        "learningResourceType": "Interactive Game",
-        "inLanguage": "es",
-        "isAccessibleForFree": true,
-        "featureList": [
-            "Crucigrama Elite con 220+ palabras",
-            "Juego de Letras interactivo",
-            "Juego de Cartas de memoria",
-            "Ahorcado Pro con gráficos SVG"
-        ]
-    }
-    </script>
-
     <script>
-        // Redirección automática a HTTPS
-        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
-            location.replace(`https:${location.href.substring(location.protocol.length)}`);
-        }
-        
-        // Optimización de rendimiento: cargar JavaScript de forma no bloqueante
-        if ('requestIdleCallback' in window) {
-            // Usar requestIdleCallback para tareas no críticas
-            requestIdleCallback(() => {
-                initializeAnimations();
-            });
-        } else {
-            // Fallback para navegadores que no soportan requestIdleCallback
-            setTimeout(initializeAnimations, 100);
-        }
-
-        function initializeAnimations() {
-            // Solo funcionalidades críticas para LCP
-            document.addEventListener('DOMContentLoaded', () => {
+        // Animaciones adicionales y funcionalidades interactivas
+        document.addEventListener('DOMContentLoaded', () => {
             // Efecto de hover mejorado para las tarjetas
             const gameCards = document.querySelectorAll('.game-card');
-            
+
             gameCards.forEach(card => {
                 card.addEventListener('mouseenter', () => {
                     card.style.transform = 'translateY(-8px) scale(1.02)';
                 });
-                
+
                 card.addEventListener('mouseleave', () => {
                     card.style.transform = 'translateY(0) scale(1)';
                 });
             });
 
-            // Funcionalidad de teclado para los botones de juego
-            const gameButtons = document.querySelectorAll('.game-button');
-            
-            gameButtons.forEach(button => {
-                // Indicador visual de foco (el enlace padre maneja la navegación)
-                button.addEventListener('focus', () => {
-                    button.style.transform = 'translateY(-2px) scale(1.02)';
-                });
-
-                button.addEventListener('blur', () => {
-                    button.style.transform = 'translateY(0) scale(1)';
-                });
-            });
-
             // Contador animado para las estadísticas
             const statNumbers = document.querySelectorAll('.stat-number');
-            
-            const animateCounter = (element, target) => {
+
+            const animateCounter = (element, target, suffix = '') => {
                 let current = 0;
                 const increment = target / 50;
                 const timer = setInterval(() => {
@@ -863,7 +673,7 @@
                         current = target;
                         clearInterval(timer);
                     }
-                    element.textContent = Math.floor(current) + (target === 100 ? '%' : target > 200 ? '+' : '');
+                    element.textContent = Math.floor(current) + suffix;
                 }, 30);
             };
 
@@ -873,39 +683,30 @@
                     if (entry.isIntersecting) {
                         const statNumber = entry.target;
                         const value = statNumber.textContent;
-                        
-                        if (value.includes('3')) animateCounter(statNumber, 3);
-                        else if (value.includes('220')) animateCounter(statNumber, 220);
-                        else if (value.includes('11')) animateCounter(statNumber, 11);
-                        else if (value.includes('100')) animateCounter(statNumber, 100);
-                        
+                        let target, suffix = '';
+
+                        if (value.includes('220')) { target = 220; suffix = '+'; }
+                        else if (value.includes('100')) { target = 100; suffix = '%'; }
+                        else if (value.includes('11')) target = 11;
+                        else if (value.includes('4')) target = 4;
+
+                        if (target) animateCounter(statNumber, target, suffix);
                         observer.unobserve(statNumber);
                     }
                 });
-            });
+            }, { threshold: 0.5 });
 
             statNumbers.forEach(stat => observer.observe(stat));
 
-            // Solo funcionalidades esenciales para LCP
-        });
-        } // Cerrar la función initializeAnimations
-
-        // Carga diferida de funcionalidades no críticas
-        if ('requestIdleCallback' in window) {
-            requestIdleCallback(() => {
-                loadNonCriticalFeatures();
-            });
-        } else {
-            setTimeout(loadNonCriticalFeatures, 2000);
-        }
-
-        function loadNonCriticalFeatures() {
             // Efecto de partículas flotantes
-            createFloatingParticles();
-        }
+            if (!document.querySelector('.particles-container')) {
+                createFloatingParticles();
+            }
+        });
 
         function createFloatingParticles() {
             const particlesContainer = document.createElement('div');
+            particlesContainer.className = 'particles-container';
             particlesContainer.style.cssText = `
                 position: fixed;
                 top: 0;
@@ -918,7 +719,7 @@
             `;
             document.body.appendChild(particlesContainer);
 
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < 10; i++) {
                 const particle = document.createElement('div');
                 particle.style.cssText = `
                     position: absolute;
@@ -930,6 +731,7 @@
                     animation: float ${10 + Math.random() * 20}s linear infinite;
                     left: ${Math.random() * 100}%;
                     animation-delay: ${Math.random() * 10}s;
+                    will-change: transform, opacity;
                 `;
                 particlesContainer.appendChild(particle);
             }
