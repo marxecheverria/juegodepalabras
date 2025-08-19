@@ -419,6 +419,34 @@
             background: var(--gradient-error);
         }
 
+        /* Información de categoría debajo del teclado */
+        .category-info {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: var(--space-md);
+            padding: var(--space-md);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--bg-glass);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: var(--space-xs);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .category-definition {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            font-style: italic;
+        }
+
         /* Botones de acción */
         .action-buttons {
             display: flex;
@@ -1265,8 +1293,8 @@
                 const categoryInfo = document.getElementById('categoryInfo');
                 if (categoryInfo) {
                     categoryInfo.innerHTML = `
-                        <div class="category-title">${this.currentCategory.toUpperCase()}</div>
-                        <div class="category-definition">${this.currentDefinition}</div>
+                        <div class="category-title">${this.currentCategory ? this.currentCategory.toUpperCase() : 'CATEGORÍA'}</div>
+                        <div class="category-definition">${this.currentDefinition || 'Descripción de la palabra'}</div>
                     `;
                     console.log('Información de categoría actualizada correctamente');
                 } else {
@@ -1289,7 +1317,18 @@
                         key.addEventListener('click', () => this.guessLetter(letter));
                         keyboard.appendChild(key);
                     }
-                    console.log('Teclado reseteado correctamente');
+                    
+                    // Agregar información de categoría y descripción debajo del teclado
+                    const categoryInfo = document.createElement('div');
+                    categoryInfo.className = 'category-info';
+                    categoryInfo.id = 'categoryInfo';
+                    categoryInfo.innerHTML = `
+                        <div class="category-title">${this.currentCategory ? this.currentCategory.toUpperCase() : 'CATEGORÍA'}</div>
+                        <div class="category-definition">${this.currentDefinition || 'Descripción de la palabra'}</div>
+                    `;
+                    keyboard.appendChild(categoryInfo);
+                    
+                    console.log('Teclado reseteado correctamente con información de categoría');
                 } else {
                     console.error('No se encontró el elemento keyboard');
                 }
