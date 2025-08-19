@@ -458,6 +458,81 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--primary-dark);
         }
+
+        /* Estilos para el contador de visitas */
+        .visit-counter {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            margin-top: var(--space-md);
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-glass);
+            border-radius: var(--radius-lg);
+            border: 2px solid var(--primary);
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+            animation: fadeInUp 0.8s ease forwards;
+            animation-delay: 0.5s;
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        .visit-counter:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+            background: var(--primary);
+            color: var(--bg-primary);
+        }
+
+        .counter-icon {
+            font-size: 1.2rem;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .counter-text {
+            font-weight: 600;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .visit-counter:hover .counter-text {
+            color: var(--bg-primary);
+        }
+
+        .counter-number {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--primary);
+            font-family: 'Space Grotesk', monospace;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        .visit-counter:hover .counter-number {
+            color: var(--bg-primary);
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        /* Responsive para el contador */
+        @media (max-width: 768px) {
+            .visit-counter {
+                flex-direction: column;
+                gap: var(--space-xs);
+                padding: var(--space-sm);
+            }
+            
+            .counter-number {
+                font-size: 1rem;
+                min-width: 60px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -472,6 +547,13 @@
                 la ortografía y las habilidades cognitivas. Cada juego ofrece una experiencia única 
                 y desafiante para todas las edades.
             </p>
+            
+            <!-- Contador de visitas -->
+            <div class="visit-counter">
+                <span class="counter-icon">👥</span>
+                <span class="counter-text">Visitas:</span>
+                <span class="counter-number" id="visitCounter">Cargando...</span>
+            </div>
         </header>
 
         <!-- Sección principal con grid de juegos -->
@@ -716,6 +798,9 @@
             if (!document.querySelector('.particles-container')) {
                 createFloatingParticles();
             }
+
+            // Inicializar contador de visitas
+            initializeVisitCounter();
         });
 
         /**
@@ -765,6 +850,74 @@
                 }
             `;
             document.head.appendChild(style);
+        }
+
+        /**
+         * Inicializa y actualiza el contador de visitas
+         */
+        async function initializeVisitCounter() {
+            try {
+                const counterElement = document.getElementById('visitCounter');
+                if (!counterElement) return;
+
+                // Incrementar contador al cargar la página
+                const response = await fetch('counter.php', {
+                    method: 'GET',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        // Mostrar el contador con animación
+                        counterElement.textContent = data.formatted;
+                        counterElement.style.opacity = '0';
+                        
+                        // Animación de entrada
+                        setTimeout(() => {
+                            counterElement.style.transition = 'opacity 0.5s ease-in-out';
+                            counterElement.style.opacity = '1';
+                        }, 100);
+
+                        // Agregar efecto de contador animado
+                        animateVisitCounter(counterElement, data.count);
+                    } else {
+                        counterElement.textContent = 'Error';
+                        console.error('Error en contador:', data.message);
+                    }
+                } else {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error al cargar contador de visitas:', error);
+                const counterElement = document.getElementById('visitCounter');
+                if (counterElement) {
+                    counterElement.textContent = 'Error';
+                }
+            }
+        }
+
+        /**
+         * Anima el contador de visitas con efecto de conteo
+         */
+        function animateVisitCounter(element, finalCount) {
+            const formattedFinal = finalCount.toLocaleString('es-ES');
+            let current = 0;
+            const increment = Math.max(1, Math.floor(finalCount / 50));
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalCount) {
+                    current = finalCount;
+                    clearInterval(timer);
+                }
+                
+                const formattedCurrent = current.toLocaleString('es-ES');
+                element.textContent = formattedCurrent;
+            }, 30);
         }
     </script>
 </body>
