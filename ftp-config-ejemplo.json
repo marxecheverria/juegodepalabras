@@ -1,0 +1,29 @@
+{
+  "ftp_server": "ftp.misitio.com",
+  "username": "tu_usuario_ftp",
+  "password": "tu_contraseña_ftp",
+  "remote_path": "/public_html/",
+  "port": 21,
+  "use_passive": true,
+  "use_binary": true,
+  "timeout": 30000,
+  "files_to_upload": [
+    "index.html",
+    "crucigrama.html",
+    "letras.html",
+    "cartas.html",
+    "ahorcado.html",
+    "words.json",
+    "config.json",
+    "palabras.txt",
+    "README.md",
+    "LICENSE"
+  ],
+  "exclude_patterns": [
+    "*.ps1",
+    "*.json",
+    ".git*",
+    "deploy*",
+    "INSTRUCCIONES*"
+  ]
+}

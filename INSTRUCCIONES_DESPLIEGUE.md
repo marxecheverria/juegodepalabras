@@ -1,239 +1,268 @@
-# 🚀 Guía de Despliegue FTP - Juegos de Palabras
-
-## 📋 Prerrequisitos
-
-- **PowerShell** instalado en Windows
-- **Credenciales FTP** de tu servidor web
-- **Acceso a internet** para conectarse al servidor
-- **Archivos del proyecto** listos para subir
-
-## 🔧 Configuración Inicial
-
-### **1. Editar Configuración FTP**
-
-Abre el archivo `deploy-config.ps1` y edita las siguientes variables:
-
-```powershell
-$FtpServer = "tu-servidor.com"        # Tu servidor FTP
-$Username = "tu-usuario-ftp"           # Tu usuario FTP
-$Password = "tu-password-ftp"          # Tu contraseña FTP
-$RemotePath = "/"                      # Ruta en el servidor
-```
-
-### **2. Verificar Archivos**
-
-El script verificará automáticamente que todos los archivos necesarios estén presentes:
-
-- ✅ `index.html` - Menú principal
-- ✅ `crucigrama.html` - Juego de crucigrama
-- ✅ `letras.html` - Juego de letras
-- ✅ `cartas.html` - Juego de cartas
-- ✅ `words.json` - Base de datos de palabras
-- ✅ `config.json` - Configuración del juego
-- ✅ `README.md` - Documentación del proyecto
-
-## 🚀 Opciones de Despliegue
-
-### **Opción 1: Despliegue Básico**
-
-```powershell
-.\deploy-clean.ps1 -FtpServer "tu-servidor.com" -Username "usuario" -Password "password"
-```
-
-### **Opción 2: Despliegue con Limpieza**
-
-```powershell
-.\deploy-clean.ps1 -FtpServer "tu-servidor.com" -Username "usuario" -Password "password" -CleanDeploy
-```
-
-**Esta opción eliminará archivos obsoletos del servidor:**
-- `index1.html` (renombrado a `letras.html`)
-- `crucigrama.txt` (reemplazado por `words.json`)
-- `palabras.txt` (reemplazado por `words.json`)
-
-### **Opción 3: Simulación (Sin Subir)**
-
-```powershell
-.\deploy-clean.ps1 -FtpServer "tu-servidor.com" -Username "usuario" -Password "password" -DryRun
-```
-
-**Útil para:**
-- Verificar que todos los archivos estén presentes
-- Calcular el tamaño total de la transferencia
-- Revisar la configuración antes del despliegue real
-
-## 📱 Ejemplos de Uso
-
-### **Ejemplo 1: Despliegue Completo**
-
-```powershell
-# Navegar al directorio del proyecto
-cd C:\Users\Usuario\Desktop\juegodepalabras
-
-# Ejecutar despliegue completo con limpieza
-.\deploy-clean.ps1 -FtpServer "ezequielrifa.imaynalla.org" -Username "tu-usuario" -Password "tu-password" -CleanDeploy
-```
-
-### **Ejemplo 2: Verificación Previa**
-
-```powershell
-# Simular despliegue para verificar archivos
-.\deploy-clean.ps1 -FtpServer "ezequielrifa.imaynalla.org" -Username "tu-usuario" -Password "tu-password" -DryRun
-```
-
-### **Ejemplo 3: Despliegue Rápido**
-
-```powershell
-# Despliegue básico sin limpieza
-.\deploy-clean.ps1 -FtpServer "ezequielrifa.imaynalla.org" -Username "tu-usuario" -Password "tu-password"
-```
-
-## 🔍 Verificación del Despliegue
-
-### **1. Verificar Archivos Subidos**
-
-Después del despliegue, verifica que estos archivos estén en tu servidor:
-
-- `index.html` - Página principal
-- `crucigrama.html` - Juego de crucigrama
-- `letras.html` - Juego de letras
-- `cartas.html` - Juego de cartas
-- `words.json` - Base de datos de palabras
-- `config.json` - Configuración del juego
-
-### **2. Probar Funcionalidad**
-
-Abre tu sitio web y verifica:
-
-- ✅ **Página principal** se carga correctamente
-- ✅ **Menú de juegos** funciona
-- ✅ **Todos los juegos** se ejecutan sin errores
-- ✅ **Base de datos de palabras** se carga correctamente
-
-### **3. URLs de Verificación**
-
-```
-https://tu-sitio.com/index.html
-https://tu-sitio.com/crucigrama.html
-https://tu-sitio.com/letras.html
-https://tu-sitio.com/cartas.html
-```
-
-## 🛠️ Solución de Problemas
-
-### **Error: "Credenciales FTP incorrectas"**
-
-```powershell
-# Verificar credenciales
-.\deploy-clean.ps1 -FtpServer "tu-servidor.com" -Username "usuario" -Password "password" -DryRun
-```
-
-### **Error: "Archivo no encontrado"**
-
-```powershell
-# Verificar que todos los archivos estén presentes
-dir *.html, *.json, *.md
-```
-
-### **Error: "Conexión FTP fallida"**
-
-- Verificar conexión a internet
-- Verificar que el servidor FTP esté activo
-- Verificar credenciales y puerto (normalmente 21)
-
-### **Error: "Permisos insuficientes"**
-
-- Verificar que tu usuario FTP tenga permisos de escritura
-- Contactar al administrador del servidor
-
-## 📊 Monitoreo del Despliegue
-
-### **Indicadores de Éxito**
-
-- ✅ Todos los archivos se suben sin errores
-- ✅ Mensaje "Despliegue completado exitosamente"
-- ✅ Tiempo de despliegue razonable
-- ✅ URLs de juegos funcionan correctamente
-
-### **Indicadores de Problemas**
-
-- ❌ Errores durante la subida de archivos
-- ❌ Archivos faltantes en el servidor
-- ❌ Juegos no funcionan después del despliegue
-- ❌ Errores de conexión FTP
-
-## 🔄 Despliegues Automáticos
-
-### **Script de Despliegue Rápido**
-
-Crea un archivo `deploy-quick.ps1`:
-
-```powershell
-# Despliegue rápido con credenciales predefinidas
-.\deploy-clean.ps1 -FtpServer "ezequielrifa.imaynalla.org" -Username "tu-usuario" -Password "tu-password" -CleanDeploy
-```
-
-### **Programación de Despliegues**
-
-```powershell
-# Crear tarea programada en Windows
-SCHTASKS /CREATE /SC DAILY /TN "Despliegue Juegos" /TR "powershell.exe -File C:\ruta\deploy-quick.ps1" /ST 09:00
-```
-
-## 📈 Optimización del Despliegue
-
-### **1. Comprimir Archivos**
-
-```powershell
-# Comprimir archivos antes del despliegue
-Compress-Archive -Path *.html, *.json, *.md -DestinationPath deploy.zip
-```
-
-### **2. Despliegue Incremental**
-
-El script ya incluye verificación de archivos existentes para evitar subidas innecesarias.
-
-### **3. Backup Automático**
-
-```powershell
-# Crear backup antes del despliegue
-$date = Get-Date -Format "yyyy-MM-dd_HH-mm"
-Copy-Item -Path "*.html" -Destination "backup_$date\"
-```
-
-## 🎯 Consejos de Despliegue
-
-### **Antes del Despliegue:**
-1. **Verificar archivos** con `-DryRun`
-2. **Hacer backup** de la versión actual
-3. **Probar localmente** todos los juegos
-4. **Verificar credenciales** FTP
-
-### **Durante el Despliegue:**
-1. **No interrumpir** el proceso
-2. **Monitorear** el progreso
-3. **Anotar** cualquier error
-4. **Verificar** archivos subidos
-
-### **Después del Despliegue:**
-1. **Probar** todos los juegos
-2. **Verificar** funcionalidad completa
-3. **Limpiar** caché del navegador
-4. **Documentar** cambios realizados
-
-## 📞 Soporte
-
-### **Problemas Comunes:**
-- **Credenciales incorrectas** → Verificar usuario y contraseña
-- **Archivos faltantes** → Verificar que todos los archivos estén presentes
-- **Errores de conexión** → Verificar conectividad y servidor FTP
-- **Permisos insuficientes** → Contactar administrador del servidor
-
-### **Recursos de Ayuda:**
-- **Logs del script** - Revisar mensajes de error
-- **Documentación del servidor** - Consultar con el proveedor de hosting
-- **Comunidad de desarrolladores** - Foros y grupos de soporte
+# 🚀 Guía Completa de Despliegue - Juegos de Palabras
+
+## 📋 Índice
+1. [Despliegue en GitHub](#despliegue-en-github)
+2. [Despliegue en Servidor FTP](#despliegue-en-servidor-ftp)
+3. [Configuración de Dominio](#configuración-de-dominio)
+4. [Solución de Problemas](#solución-de-problemas)
 
 ---
 
-**¡Con esta guía tendrás un despliegue exitoso y profesional de tu suite de juegos educativos!** 🎮✨
+## 🌟 Despliegue en GitHub
+
+### Paso 1: Crear Repositorio en GitHub
+
+1. **Ve a GitHub.com** e inicia sesión
+2. **Haz clic en "New"** (botón verde)
+3. **Configura el repositorio:**
+   - **Nombre**: `juegodepalabras`
+   - **Descripción**: `🎮 Suite Educativa Interactiva de Juegos de Palabras`
+   - **Visibilidad**: ✅ **Público** (Public)
+   - **NO marques**: README, .gitignore, o licencia
+4. **Haz clic en "Create repository"**
+
+### Paso 2: Conectar Repositorio Local con GitHub
+
+```powershell
+# Agregar el repositorio remoto (reemplaza USERNAME con tu usuario de GitHub)
+git remote add origin https://github.com/USERNAME/juegodepalabras.git
+
+# Verificar que se agregó correctamente
+git remote -v
+
+# Subir el código a GitHub
+git branch -M main
+git push -u origin main
+```
+
+### Paso 3: Configurar GitHub Pages (Opcional)
+
+1. **Ve a Settings** en tu repositorio
+2. **Selecciona "Pages"** en el menú izquierdo
+3. **En "Source" selecciona "Deploy from a branch"**
+4. **Selecciona la rama "main"** y carpeta "/ (root)"
+5. **Haz clic en "Save"**
+
+Tu sitio estará disponible en: `https://USERNAME.github.io/juegodepalabras`
+
+---
+
+## 🌐 Despliegue en Servidor FTP
+
+### Paso 1: Preparar Credenciales FTP
+
+Necesitarás:
+- **Servidor FTP**: `ftp.tudominio.com` o IP del servidor
+- **Usuario**: Tu nombre de usuario FTP
+- **Contraseña**: Tu contraseña FTP
+- **Ruta remota**: `/public_html/` o `/www/` (depende del hosting)
+
+### Paso 2: Usar el Script de Despliegue Automático
+
+#### Opción A: Despliegue Directo
+```powershell
+# Ejecutar el script de despliegue
+.\deploy-ftp.ps1 -FtpServer "ftp.tudominio.com" -Username "tu_usuario" -Password "tu_contraseña" -RemotePath "/public_html/"
+```
+
+#### Opción B: Simulación (Dry Run)
+```powershell
+# Simular el despliegue sin subir archivos
+.\deploy-ftp.ps1 -FtpServer "ftp.tudominio.com" -Username "tu_usuario" -Password "tu_contraseña" -RemotePath "/public_html/" -DryRun
+```
+
+#### Opción C: Despliegue en Subdirectorio
+```powershell
+# Desplegar en una subcarpeta específica
+.\deploy-ftp.ps1 -FtpServer "ftp.tudominio.com" -Username "tu_usuario" -Password "tu_contraseña" -RemotePath "/public_html/juegos/"
+```
+
+### Paso 3: Verificar el Despliegue
+
+1. **Conecta por FTP** a tu servidor
+2. **Verifica que los archivos estén en la ubicación correcta**
+3. **Abre tu sitio web** en el navegador
+4. **Prueba todos los juegos** para asegurar funcionamiento
+
+---
+
+## 🔧 Configuración de Dominio
+
+### Configuración DNS
+
+Si tienes un dominio personalizado:
+
+1. **Ve a tu proveedor de DNS** (Cloudflare, GoDaddy, etc.)
+2. **Crea un registro A** apuntando a la IP de tu servidor
+3. **Crea un registro CNAME** para `www` apuntando a tu dominio principal
+
+### Configuración del Servidor Web
+
+#### Apache (.htaccess)
+```apache
+# Crear archivo .htaccess en la raíz
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ index.html [L]
+
+# Compresión GZIP
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/xml
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/x-javascript
+</IfModule>
+
+# Caché del navegador
+<IfModule mod_expires.c>
+    ExpiresActive on
+    ExpiresByType text/css "access plus 1 year"
+    ExpiresByType application/javascript "access plus 1 year"
+    ExpiresByType image/png "access plus 1 year"
+    ExpiresByType image/jpg "access plus 1 year"
+    ExpiresByType image/jpeg "access plus 1 year"
+</IfModule>
+```
+
+#### Nginx
+```nginx
+server {
+    listen 80;
+    server_name tudominio.com www.tudominio.com;
+    root /var/www/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # Compresión GZIP
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+}
+```
+
+---
+
+## 🚨 Solución de Problemas
+
+### Problemas Comunes de GitHub
+
+#### Error: "Repository not found"
+- Verifica que el repositorio existe y es público
+- Confirma que tienes permisos de escritura
+- Revisa que la URL del remote sea correcta
+
+#### Error: "Authentication failed"
+- Verifica tu token de acceso personal
+- Confirma que el token tenga permisos de repo
+- Regenera el token si es necesario
+
+### Problemas Comunes de FTP
+
+#### Error: "Connection timeout"
+- Verifica la dirección del servidor FTP
+- Confirma que el puerto 21 esté abierto
+- Revisa la configuración del firewall
+
+#### Error: "Authentication failed"
+- Verifica usuario y contraseña
+- Confirma que la cuenta FTP esté activa
+- Revisa si el hosting requiere SFTP en lugar de FTP
+
+#### Error: "Permission denied"
+- Verifica que tengas permisos de escritura
+- Confirma que la ruta remota sea correcta
+- Revisa la configuración de permisos del servidor
+
+### Problemas de Despliegue
+
+#### Los juegos no funcionan
+- Verifica que todos los archivos se subieron
+- Confirma que las rutas relativas sean correctas
+- Revisa la consola del navegador para errores
+
+#### Problemas de rendimiento
+- Activa la compresión GZIP
+- Configura el caché del navegador
+- Optimiza las imágenes si las hay
+
+---
+
+## 📱 Pruebas Post-Despliegue
+
+### Checklist de Verificación
+
+- [ ] **Página principal** se carga correctamente
+- [ ] **Todos los juegos** son accesibles
+- [ ] **Navegación** funciona en móvil y desktop
+- [ ] **Funcionalidades** de cada juego operan correctamente
+- [ ] **Responsive design** se ve bien en todos los dispositivos
+- [ ] **Tiempo de carga** es aceptable (< 3 segundos)
+
+### Herramientas de Prueba
+
+- **Google PageSpeed Insights**: Para rendimiento
+- **GTmetrix**: Para análisis de velocidad
+- **BrowserStack**: Para pruebas en diferentes dispositivos
+- **Lighthouse**: Para auditoría completa
+
+---
+
+## 🔄 Actualizaciones Futuras
+
+### Flujo de Trabajo para Actualizaciones
+
+1. **Hacer cambios** en tu código local
+2. **Commit y push** a GitHub:
+   ```powershell
+   git add .
+   git commit -m "Descripción de los cambios"
+   git push origin main
+   ```
+3. **Desplegar** al servidor FTP:
+   ```powershell
+   .\deploy-ftp.ps1 -FtpServer "ftp.tudominio.com" -Username "tu_usuario" -Password "tu_contraseña"
+   ```
+
+### Automatización (Opcional)
+
+Para automatizar el despliegue, puedes:
+- **Configurar GitHub Actions** para deploy automático
+- **Usar webhooks** para sincronización automática
+- **Configurar cron jobs** para sincronización periódica
+
+---
+
+## 📞 Soporte
+
+### Recursos de Ayuda
+
+- **Documentación oficial**: [GitHub Docs](https://docs.github.com/)
+- **Guía FTP**: [FileZilla Wiki](https://wiki.filezilla-project.org/)
+- **Soporte del hosting**: Contacta a tu proveedor de hosting
+
+### Contacto del Proyecto
+
+- **Desarrollador**: Marx Echeverría
+- **Repositorio**: [github.com/marxecheverria/juegodepalabras](https://github.com/marxecheverria/juegodepalabras)
+- **Issues**: Reporta problemas en GitHub
+
+---
+
+## 🎉 ¡Felicidades!
+
+Has desplegado exitosamente tu suite de juegos de palabras. Ahora puedes:
+
+- **Compartir** el enlace con amigos y familia
+- **Usar** en entornos educativos
+- **Contribuir** al desarrollo del proyecto
+- **Recibir feedback** de la comunidad
+
+**¡Disfruta de tu proyecto en línea!** 🚀✨
