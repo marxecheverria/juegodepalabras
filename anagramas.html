@@ -774,33 +774,14 @@
                 
                 const data = await response.json();
                 
-                // Extraer todas las palabras de todas las categorías
-                let allWords = [];
-                for (const category in data.categories) {
-                    allWords = allWords.concat(data.categories[category]);
-                }
-                
-                if (allWords.length >= 10) {
-                    // Agregar un poco de aleatoriedad adicional mezclando las categorías
-                    const categoryKeys = Object.keys(data.categories);
-                    for (let i = categoryKeys.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [categoryKeys[i], categoryKeys[j]] = [categoryKeys[j], categoryKeys[i]];
-                    }
-                    
-                    // Reconstruir el array mezclando las categorías
-                    allWords = [];
-                    for (const category of categoryKeys) {
-                        allWords = allWords.concat(data.categories[category]);
-                    }
-                    
-                    // Seleccionar 10 palabras al azar
-                    gameState.words = getRandomWords(allWords, 10);
+                // Usar específicamente la sección de anagramas
+                if (data.anagramas && data.anagramas.length >= 10) {
+                    // Seleccionar 10 palabras al azar de la sección de anagramas
+                    gameState.words = getRandomWords(data.anagramas, 10);
                     
                     // Log para debugging - mostrar las palabras seleccionadas
-                    console.log('Total de palabras disponibles:', allWords.length);
-                    console.log('Categorías disponibles:', categoryKeys);
-                    console.log('Palabras seleccionadas para esta partida:');
+                    console.log('Total de anagramas disponibles:', data.anagramas.length);
+                    console.log('Anagramas seleccionados para esta partida:');
                     gameState.words.forEach((wordObj, index) => {
                         console.log(`${index + 1}. ${wordObj.word} - ${wordObj.definition}`);
                     });
@@ -809,24 +790,24 @@
                     showCurrentWord();
                     updateWordsList();
                 } else {
-                    showError('No hay suficientes palabras disponibles en el archivo JSON.');
+                    showError('No hay suficientes anagramas disponibles en el archivo JSON.');
                 }
             } catch (error) {
-                console.error('Error al cargar palabras desde JSON:', error);
+                console.error('Error al cargar anagramas desde JSON:', error);
                 
                 // Fallback: usar palabras predefinidas si falla la carga del JSON
-                console.log('Usando palabras predefinidas como fallback...');
+                console.log('Usando anagramas predefinidos como fallback...');
                 const fallbackWords = [
-                    { word: "PLATANO", definition: "Fruta amarilla tropical" },
-                    { word: "MARTE", definition: "Planeta rojo del sistema solar" },
-                    { word: "PARIS", definition: "Capital de Francia" },
-                    { word: "ORO", definition: "Metal precioso de color amarillo" },
-                    { word: "PERRO", definition: "Animal doméstico que ladra" },
-                    { word: "MANZANA", definition: "Fruta roja, verde o amarilla" },
-                    { word: "ELEFANTE", definition: "Mamífero terrestre de gran tamaño con trompa" },
-                    { word: "BALON", definition: "Objeto esférico usado en deportes" },
-                    { word: "LIBRO", definition: "Conjunto de hojas impresas encuadernadas" },
-                    { word: "SOL", definition: "Estrella que ilumina la Tierra" }
+                    { word: "AMOR", definition: "Sentimiento de afecto y cariño" },
+                    { word: "ROMA", definition: "Capital de Italia, ciudad eterna" },
+                    { word: "CASA", definition: "Lugar donde vive una familia" },
+                    { word: "SACA", definition: "Tercera persona del presente de sacar" },
+                    { word: "PATO", definition: "Ave acuática de pico ancho" },
+                    { word: "TOPA", definition: "Tercera persona del presente de topar" },
+                    { word: "SOL", definition: "Estrella que ilumina la Tierra" },
+                    { word: "LOS", definition: "Artículo determinado plural" },
+                    { word: "PAN", definition: "Alimento básico hecho con harina" },
+                    { word: "NAP", definition: "Siesta corta, descanso breve" }
                 ];
                 
                 gameState.words = fallbackWords;
