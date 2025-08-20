@@ -38,19 +38,30 @@ if (-not $FtpServer -or -not $Username -or -not $Password) {
 
 # Archivos principales a subir
 $FilesToUpload = @(
+    # Archivos HTML principales
     "index.html",                    # Menú principal interactivo
     "ahorcado.html",                # Juego del ahorcado Pro
     "crucigrama.html",              # Juego de crucigrama
     "letras.html",                  # Juego de letras
     "cartas.html",                  # Juego de cartas
+    "anagramas.html",               # Juego de anagramas
+    
+    # Archivos de datos y configuración
     "words.json",                   # Base de datos de palabras
     "config.json",                  # Configuración del juego
     "palabras.txt",                 # Archivo de palabras adicionales
+    
+    # Archivos de configuración del servidor
     ".htaccess",                    # Configuración de seguridad y HTTPS
+    "counter.php",                  # Contador de visitas
+    "visit_counter.txt",            # Archivo de contador de visitas
+    
+    # Documentación del proyecto
     "README.md",                    # Documentación del proyecto
     "INSTRUCCIONES.md",             # Instrucciones generales
     "INSTRUCCIONES_DESPLIEGUE.md",  # Instrucciones de despliegue
-    "INSTRUCCIONES_OPTIMIZACION.md" # Documentación técnica
+    "INSTRUCCIONES_OPTIMIZACION.md", # Documentación técnica
+    "CONTADOR_VISITAS.md"          # Documentación del contador de visitas
 )
 
 # Archivos opcionales (si existen)
@@ -156,7 +167,9 @@ function Clean-OldFiles {
     $obsoleteFiles = @(
         "index1.html",      # Renombrado a letras.html
         "crucigrama.txt",   # Reemplazado por words.json
-        "palabras.txt"      # Reemplazado por words.json
+        "palabras.txt",     # Reemplazado por words.json
+        "tatus",            # Archivo temporal obsoleto
+        "ftp-config-ejemplo.json"  # Archivo de ejemplo no necesario en producción
     )
     
     foreach ($file in $obsoleteFiles) {
@@ -220,6 +233,7 @@ if ($successCount -eq $totalFiles) {
     Write-Host "  Crucigrama Elite: https://ezequielrifa.imaynalla.org/crucigrama.html" -ForegroundColor $Green
     Write-Host "  Juego de Letras: https://ezequielrifa.imaynalla.org/letras.html" -ForegroundColor $Green
     Write-Host "  Juego de Cartas: https://ezequielrifa.imaynalla.org/cartas.html" -ForegroundColor $Green
+    Write-Host "  Juego de Anagramas: https://ezequielrifa.imaynalla.org/anagramas.html" -ForegroundColor $Green
 } else {
     Write-Host "Despliegue parcial. Revisa los errores arriba." -ForegroundColor $Yellow
 }

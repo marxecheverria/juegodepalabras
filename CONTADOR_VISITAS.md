@@ -19,9 +19,9 @@ El contador de visitas es una funcionalidad que registra automáticamente cada v
 - **Formato**: Texto plano, un número por línea
 
 ### 3. **Interfaz Visual (`index.html`)**
-- **Ubicación**: Header principal, debajo de la descripción
-- **Diseño**: Tarjeta con icono, texto y número
-- **Animaciones**: Efectos de entrada y hover
+- **Ubicación**: Sección "📊 Estadísticas del Proyecto", como quinta estadística
+- **Diseño**: Integrado con el grid de estadísticas existente
+- **Animaciones**: Efectos de brillo y pulso integrados
 
 ## 🚀 Funcionamiento
 
@@ -58,7 +58,7 @@ async function initializeVisitCounter() {
 
 ```
 juegodepalabras/
-├── index.html          # Página principal con contador
+├── index.html          # Página principal con contador integrado en estadísticas
 ├── counter.php         # Lógica del contador
 ├── visit_counter.txt   # Almacenamiento del número
 ├── .htaccess          # Configuración del servidor
